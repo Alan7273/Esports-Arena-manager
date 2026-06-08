@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/Msvcs-equipos/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Msvcs-inscripciones/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Msvcs-juegos/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Msvcs-notificaciones/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Msvcs-partidas/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Msvcs-premios/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Msvcs-rankings/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Msvcs-resultados/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Msvcs-sanciones/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Msvcs-torneos/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Msvcs-usuarios/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+  </component>
+</project>
