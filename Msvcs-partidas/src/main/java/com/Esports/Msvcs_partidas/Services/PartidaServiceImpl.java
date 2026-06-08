@@ -38,7 +38,7 @@ public class PartidaServiceImpl implements PartidaService {
         if (!inscripcionClient.existeParticipante(dto.getTorneoId(), dto.getParticipanteBId())) {
             throw new ResourceNotFoundException("El participante B no está inscrito en el torneo");
         }
-
+hola
         Partida partida = new Partida();
         partida.setTorneoId(dto.getTorneoId());
         partida.setParticipanteAId(dto.getParticipanteAId());
