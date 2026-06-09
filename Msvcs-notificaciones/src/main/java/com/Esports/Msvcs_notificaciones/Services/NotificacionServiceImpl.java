@@ -100,4 +100,14 @@ public class NotificacionServiceImpl implements NotificacionService {
 
         return "Notificación marcada como leída";
     }
+
+    @Override
+    public String eliminarNotificacion(Long id) {
+        Notificacion notificacion = notificacionRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Notificación no encontrada"));
+
+        notificacionRepository.delete(notificacion);
+
+        return "Notificación eliminada";
+    }
 }

@@ -2,6 +2,7 @@ package com.Esports.Msvcs_sanciones.Controllers;
 
 import com.Esports.Msvcs_sanciones.Services.SancionesService;
 import com.Esports.Msvcs_sanciones.models.Sancion;
+import com.Esports.Msvcs_sanciones.models.dtos.ActualizarSancionDTO;
 import com.Esports.Msvcs_sanciones.models.dtos.CrearSancionDTO;
 import com.Esports.Msvcs_sanciones.models.dtos.SancionResponseDTO;
 import jakarta.validation.Valid;
@@ -39,8 +40,13 @@ public class SancionesController {
         return ResponseEntity.status(HttpStatus.OK).body(sancionesService.cerrarSancion(id));
     }
 
-    @PutMapping("/validar/{usuarioId}")
+    @GetMapping("/validar/{usuarioId}")
     public ResponseEntity<Boolean> validarSancionActiva(@PathVariable Long usuarioId) {
         return ResponseEntity.status(HttpStatus.OK).body(sancionesService.validarSancionActiva(usuarioId));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<SancionResponseDTO> actualizarSancion(@PathVariable Long id, @Valid @RequestBody ActualizarSancionDTO dto) {
+        return ResponseEntity.status(HttpStatus.OK).body(sancionesService.actualizarSancion(id, dto));
     }
 }

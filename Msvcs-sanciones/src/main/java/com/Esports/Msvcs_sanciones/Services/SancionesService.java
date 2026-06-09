@@ -1,5 +1,6 @@
 package com.Esports.Msvcs_sanciones.Services;
 
+import com.Esports.Msvcs_sanciones.models.dtos.ActualizarSancionDTO;
 import com.Esports.Msvcs_sanciones.models.dtos.CrearSancionDTO;
 import com.Esports.Msvcs_sanciones.models.dtos.SancionResponseDTO;
 
@@ -11,4 +12,5 @@ public interface SancionesService {
     SancionResponseDTO buscarSancion(Long id);
     String cerrarSancion(Long id);
     Boolean validarSancionActiva(Long usuarioId);
+    SancionResponseDTO actualizarSancion(Long id, ActualizarSancionDTO dto);
 }

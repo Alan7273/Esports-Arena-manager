@@ -3,6 +3,7 @@ package com.Esports.Msvcs_sanciones.Services;
 import com.Esports.Msvcs_sanciones.clients.UsuarioClient;
 import com.Esports.Msvcs_sanciones.exceptions.ResourceNotFoundException;
 import com.Esports.Msvcs_sanciones.models.Sancion;
+import com.Esports.Msvcs_sanciones.models.dtos.ActualizarSancionDTO;
 import com.Esports.Msvcs_sanciones.models.dtos.CrearSancionDTO;
 import com.Esports.Msvcs_sanciones.models.dtos.SancionResponseDTO;
 import com.Esports.Msvcs_sanciones.repositories.SancionesRepository;
@@ -103,5 +104,31 @@ public class SancionesServiceImpl implements SancionesService {
     @Override
     public Boolean validarSancionActiva(Long usuarioId) {
         return sancionRepository.existsByUsuarioIdAndEstadoSancion(usuarioId, "ACTIVA");
+    }
+
+    @Override
+    public SancionResponseDTO actualizarSancion(Long id, ActualizarSancionDTO dto) {
+        Sancion sancion = sancionRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Sanción no encontrada"));
+
+        if (dto.getMotivo() != null) sancion.setMotivo(dto.getMotivo());
+        if (dto.getFechaInicio() != null) sancion.setFechaInicio(dto.getFechaInicio());
+        if (dto.getFechaFin() != null) sancion.setFechaFin(dto.getFechaFin());
+        if (dto.getEstadoSancion() != null) sancion.setEstadoSancion(dto.getEstadoSancion());
+        if (dto.getSeveridad() != null) sancion.setSeveridad(dto.getSeveridad());
+
+        sancionRepository.save(sancion);
+
+        SancionResponseDTO response = new SancionResponseDTO();
+        response.setSancionId(sancion.getSancionId());
+        response.setUsuarioId(sancion.getUsuarioId());
+        response.setEquipoId(sancion.getEquipoId());
+        response.setMotivo(sancion.getMotivo());
+        response.setFechaInicio(sancion.getFechaInicio());
+        response.setFechaFin(sancion.getFechaFin());
+        response.setEstadoSancion(sancion.getEstadoSancion());
+        response.setSeveridad(sancion.getSeveridad());
+
+        return response;
     }
 }

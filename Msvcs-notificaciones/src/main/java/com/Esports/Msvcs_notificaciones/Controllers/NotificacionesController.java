@@ -36,8 +36,13 @@ public class NotificacionesController {
         return ResponseEntity.status(HttpStatus.OK).body(notificacionService.buscarNotificacion(id));
     }
 
-    @DeleteMapping("/leida/{id}")
+    @PutMapping("/leida/{id}")
     public ResponseEntity<String> marcarLeida(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(notificacionService.marcarLeida(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> eliminarNotificacion(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(notificacionService.eliminarNotificacion(id));
     }
 }

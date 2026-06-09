@@ -11,4 +11,5 @@ public interface NotificacionService {
     List<NotificacionResponseDTO> listarUsuario(Long usuarioId);
     NotificacionResponseDTO buscarNotificacion(Long id);
     String marcarLeida(Long id);
+    String eliminarNotificacion(Long id);
 }
