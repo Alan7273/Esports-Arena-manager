@@ -2,6 +2,7 @@ package com.Esports.Msvcs_usuarios.services;
 
 import com.Esports.Msvcs_usuarios.Services.UsuarioService;
 import com.Esports.Msvcs_usuarios.Services.UsuarioServiceImpl;
+import com.Esports.Msvcs_usuarios.exceptions.ResourceNotFoundException;
 import com.Esports.Msvcs_usuarios.models.Usuario;
 import com.Esports.Msvcs_usuarios.repositories.UsuariosRepository;
 import net.datafaker.Faker;
@@ -17,8 +18,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,6 +72,18 @@ public class UsuarioServiceTest {
         assertThat(result).hasSize(usuariosList.size());
         assertThat(result).contains(this.usuarioPrueba);
         verify(this.usuariosRepository, times(1)).findAll();
+    }
 
+    @Test
+    @DisplayName("Debe buscar un medico con un id inexistente")
+    public void shouldNotFindUsuarioById() {
+        Long id = 9999L;
+        when(this.usuariosRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> {
+            this.usuarioService.BuscarPorId(id);
+        }).isInstanceOf(ResourceNotFoundException.class)
+                        .hasMessage("Medico no encontrado");
+        verify(this.usuariosRepository, times(1)).findById(id);
     }
 }
