@@ -12,7 +12,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 public class CrearUsuarioDTO {
-    private Long usuarioId;
     private String nombreusuario;
     private String nickname;
     private String correo;
