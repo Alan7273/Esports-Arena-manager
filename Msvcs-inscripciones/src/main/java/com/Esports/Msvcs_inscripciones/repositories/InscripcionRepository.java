@@ -23,4 +23,7 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Long> 
 
     // Metodo que me permite revisar si el torneo y el usuario existe
     Boolean existsByTorneoIdAndEquipoId(Long torneoId, Long equipoId);
+
+    // Contar inscripciones activas (no canceladas) por torneo
+    Long countByTorneoIdAndEstadoNot(Long torneoId, String estado);
 }

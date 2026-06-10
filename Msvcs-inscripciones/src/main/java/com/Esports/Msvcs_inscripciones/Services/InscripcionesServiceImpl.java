@@ -3,10 +3,13 @@ package com.Esports.Msvcs_inscripciones.Services;
 import com.Esports.Msvcs_inscripciones.clients.EquipoClient;
 import com.Esports.Msvcs_inscripciones.clients.SancionClient;
 import com.Esports.Msvcs_inscripciones.clients.TorneoClient;
+import com.Esports.Msvcs_inscripciones.exceptions.BadRequestException;
+import com.Esports.Msvcs_inscripciones.exceptions.DuplicateResourceException;
 import com.Esports.Msvcs_inscripciones.exceptions.ResourceNotFoundException;
 import com.Esports.Msvcs_inscripciones.models.Inscripcion;
 import com.Esports.Msvcs_inscripciones.models.dtos.CrearInscripcionDTO;
 import com.Esports.Msvcs_inscripciones.models.dtos.InscripcionResponseDTO;
+import com.Esports.Msvcs_inscripciones.models.dtos.TorneoResponseDTO;
 import com.Esports.Msvcs_inscripciones.repositories.InscripcionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +43,24 @@ public class InscripcionesServiceImpl implements InscripcionesService {
         }
         if (dto.getUsuarioId() != null && sancionClient.tieneSancionActiva(dto.getUsuarioId())) {
             throw new RuntimeException("El usuario tiene una sanción activa");
+        }
+        TorneoResponseDTO torneo = torneoClient.buscarTorneo(dto.getTorneoId());
+        if (!torneo.getEstadoTorneo().equals("ACTIVO")) {
+            throw new BadRequestException("Solo se puede inscribir en torneos ACTIVOS");
+        }
+
+        Long inscritos = inscripcionRepository.countByTorneoIdAndEstadoNot(dto.getTorneoId(), "CANCELADA");
+        if (inscritos >= torneo.getCupoMaximo()) {
+            throw new BadRequestException("El torneo no tiene cupos disponibles");
+        }
+
+        if (dto.getUsuarioId() != null &&
+                inscripcionRepository.existsByTorneoIdAndUsuarioId(dto.getTorneoId(), dto.getUsuarioId())) {
+            throw new DuplicateResourceException("El usuario ya está inscrito en este torneo");
+        }
+        if (dto.getEquipoId() != null &&
+                inscripcionRepository.existsByTorneoIdAndEquipoId(dto.getTorneoId(), dto.getEquipoId())) {
+            throw new DuplicateResourceException("El equipo ya está inscrito en este torneo");
         }
         Inscripcion inscripcion = new Inscripcion();
         inscripcion.setTorneoId(dto.getTorneoId());
@@ -105,14 +126,7 @@ public class InscripcionesServiceImpl implements InscripcionesService {
         Inscripcion inscripcion = inscripcionRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Inscripcion no encontrada"));
 
-        inscripcion.setTorneoId(inscripcion.getTorneoId());
-        inscripcion.setEquipoId(inscripcion.getEquipoId());
-        inscripcion.setUsuarioId(inscripcion.getUsuarioId());
-        inscripcion.setNombreJugador(inscripcion.getNombreJugador());
-        inscripcion.setTipoParticipante(inscripcion.getTipoParticipante());
-        inscripcion.setEstado(inscripcion.getEstado());
-        inscripcion.setFechaInscripcion(inscripcion.getFechaInscripcion());
-
+        inscripcion.setEstado(estado);
         inscripcionRepository.save(inscripcion);
 
         InscripcionResponseDTO dto = new InscripcionResponseDTO();

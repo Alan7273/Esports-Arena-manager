@@ -9,6 +9,9 @@ import com.Esports.Msvcs_resultados.repositories.ResultadosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.Esports.Msvcs_resultados.clients.PartidaClient;
+import com.Esports.Msvcs_resultados.exceptions.BadRequestException;
+import com.Esports.Msvcs_resultados.models.dtos.PartidaResponseDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,8 +23,27 @@ public class ResultadoServiceImpl implements ResultadoService {
     @Autowired
     private ResultadosRepository resultadosRepository;
 
+    @Autowired
+    private PartidaClient partidaClient;
+
     @Override
     public ResultadoResponseDTO registrarResultado(CrearResultadoDTO dto) {
+
+        // Regla: la partida debe existir y estar FINALIZADA o EN_CURSO
+        PartidaResponseDTO partida = partidaClient.buscarPartida(dto.getPartidaId());
+        if (partida.getEstadopartida().equals("CANCELADA")) {
+            throw new BadRequestException("No se puede registrar resultado de una partida cancelada");
+        }
+        // Regla: el ganador debe ser uno de los dos participantes
+        boolean ganadorValido = dto.getGanadorId().equals(partida.getParticipanteAId())
+                || dto.getGanadorId().equals(partida.getParticipanteBId());
+        if (!ganadorValido) {
+            throw new BadRequestException("El ganador debe ser uno de los participantes de la partida");
+        }
+        // Regla: no registrar resultado duplicado para la misma partida
+        if (resultadosRepository.existsByPartidaId(dto.getPartidaId())) {
+            throw new BadRequestException("Ya existe un resultado registrado para esta partida");
+        }
         Resultado resultado = new Resultado();
         resultado.setPartidaId(dto.getPartidaId());
         resultado.setGanadorId(dto.getGanadorId());

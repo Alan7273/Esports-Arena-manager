@@ -15,4 +15,6 @@ public interface ResultadosRepository extends JpaRepository<Resultado, Long> {
     List<Resultado> findByEstadoValidacion(String estadoValidacion);
     // Metodo que me permite buscar el id del ganador
     List<Resultado> findByGanadorId(Long ganadorId);
+    // Metodo que permite buscar si existe partida por el id
+    boolean existsByPartidaId(Long partidaId);
 }
