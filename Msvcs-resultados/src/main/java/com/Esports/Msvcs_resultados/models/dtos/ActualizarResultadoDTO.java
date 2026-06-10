@@ -14,11 +14,18 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ActualizarResultadoDTO {
 
-    private Long resultadoId;
+
     private Long partidaId;
+
+    @PositiveOrZero(message = "El puntaje no puede ser negativo")
     private Integer puntajeA;
+
+    @PositiveOrZero(message = "El puntaje no puede ser negativo")
     private Integer puntajeB;
-    private Integer ganadorId;
+
+    private Long ganadorId;
+
     private String estadoValidacion;
+
     private LocalDate fechaRegistro;
 }
