@@ -1,5 +1,7 @@
 package com.Esports.Msvcs_equipos.models.dtos;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,9 +14,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @ToString
 public class AgregarMiembroDTO {
-    private Long MiembroId;
+
+    @NotNull(message = "El usuario es obligatorio")
     private Long usuarioId;
+
+    @NotBlank(message = "El rol dentro del equipo no puede estar vacío")
     private String rolDentroEquipo;
-    private Long equipoId;
-    private LocalDateTime fechaIngreso;
 }
