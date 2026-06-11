@@ -22,6 +22,7 @@ import java.util.List;
 @Transactional
 public class EquipoServiceImpl implements EquipoService {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EquipoServiceImpl.class);
     @Autowired
     private EquiposRepository equiposRepository;
 
@@ -36,6 +37,7 @@ public class EquipoServiceImpl implements EquipoService {
 
     @Override
     public EquipoResponseDTO crearEquipo(CrearEquipoDTO dto) {
+        log.info("Creando equipo con nombre: {}", dto.getNombreequipo());
         if (!usuarioClient.existeUsuario(dto.getCapitanId())){
             throw new ResourceNotFoundException("El usuario capitan no existe");
         }
@@ -58,11 +60,13 @@ public class EquipoServiceImpl implements EquipoService {
         response.setJuegoprincipalId(equipos.getJuegoprincipalId());
         response.setEstadoequipo(equipos.getEstadoequipo());
 
+        log.info("Equipo creado exitosamente con ID: {}", equipos.getEquipoId());
         return response;
     }
 
     @Override
     public List<EquipoResponseDTO> listarEquipos() {
+        log.info("Listando todos los equipos");
         return equiposRepository.findAll().stream().map(equipos -> {
             EquipoResponseDTO dto = new EquipoResponseDTO();
             dto.setEquipoId(equipos.getEquipoId());
@@ -76,6 +80,7 @@ public class EquipoServiceImpl implements EquipoService {
 
     @Override
     public EquipoResponseDTO buscarEquipo(Long id) {
+        log.info("Buscando equipo con ID: {}", id);
         Equipos equipos = equiposRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Equipo no encontrado"));
 
@@ -86,6 +91,7 @@ public class EquipoServiceImpl implements EquipoService {
         dto.setJuegoprincipalId(equipos.getJuegoprincipalId());
         dto.setEstadoequipo(equipos.getEstadoequipo());
 
+        log.info("Equipo encontrado: {}", equipos.getNombreequipo());
         return dto;
     }
 

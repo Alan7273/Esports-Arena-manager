@@ -16,12 +16,14 @@ import java.util.List;
 @Service
 @Transactional
 public class UsuarioServiceImpl implements UsuarioService {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UsuarioServiceImpl.class);
 
     @Autowired
     private UsuariosRepository usuariosRepository;
 
     @Override
     public UsuarioResponseDTO crearUsuario(CrearUsuarioDTO dto) {
+        log.info("Creando usuario con correo: {}", dto.getCorreo());
         Usuario usuario = new Usuario();
         usuario.setNombreusuario(dto.getNombreusuario());
         usuario.setNickname(dto.getNickname());
@@ -42,12 +44,13 @@ public class UsuarioServiceImpl implements UsuarioService {
         response.setEstadousuario(usuario.getEstadousuario());
         response.setFechaRegistro(usuario.getFechaRegistro());
 
+        log.info("Usuario creado exitosamente con ID: {}", usuario.getUsuarioId());
         return response;
     }
 
     @Override
     public List<UsuarioResponseDTO> ListarUsuarios() {
-
+        log.info("Listando todos los usuarios");
         List<Usuario> usuarios = usuariosRepository.findAll();
         return usuarios.stream().map(usuario -> {
             UsuarioResponseDTO dto = new UsuarioResponseDTO();
@@ -66,9 +69,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioResponseDTO BuscarPorId(Long usuarioId) {
-
-        Usuario usuario = usuariosRepository.findById(usuarioId).orElseThrow(
-                () -> new ResourceNotFoundException("Usuario no encontrado"));
+        log.info("Buscando usuario con ID: {}", usuarioId);
+        Usuario usuario = usuariosRepository.findById(usuarioId).orElseThrow(() -> {
+            log.warn("Usuario no encontrado con ID: {}", usuarioId);
+            return new ResourceNotFoundException("Usuario no encontrado");
+        });
+        log.info("Usuario encontrado: {}", usuario.getNickname());
 
         UsuarioResponseDTO dto = new UsuarioResponseDTO();
         dto.setUsuarioId(usuario.getUsuarioId());
@@ -85,8 +91,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public UsuarioResponseDTO actualizarUsuario(Long usuarioId, ActualizarUsuarioDTO dto) {
 
-        Usuario usuario = usuariosRepository.findById(usuarioId).orElseThrow(
-                () -> new ResourceNotFoundException("Usuario no encontrado"));
+        log.info("Actualizando usuario con ID: {}", usuarioId);
+        Usuario usuario = usuariosRepository.findById(usuarioId).orElseThrow(() -> {
+            log.warn("Usuario no encontrado con ID: {}", usuarioId);
+            return new ResourceNotFoundException("Usuario no encontrado");
+        });
 
         usuario.setNombreusuario(dto.getNombreusuario());
         usuario.setNickname(dto.getNickname());
@@ -107,18 +116,24 @@ public class UsuarioServiceImpl implements UsuarioService {
         response.setEstadousuario(usuario.getEstadousuario());
         response.setFechaRegistro(usuario.getFechaRegistro());
 
+        log.info("Usuario actualizado exitosamente con ID: {}", usuarioId);
         return response;
     }
 
     @Override
     public String DesactivarUsuario(Long usuarioId) {
-        Usuario usuario = usuariosRepository.findById(usuarioId).orElseThrow(
-                () -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        log.info("Desactivando usuario con ID: {}", usuarioId);
+        Usuario usuario = usuariosRepository.findById(usuarioId).orElseThrow(() -> {
+            log.warn("Usuario no encontrado con ID: {}", usuarioId);
+            return new ResourceNotFoundException("Usuario no encontrado");
+        });
 
         usuario.setEstadousuario("INACTIVO");
 
         usuariosRepository.save(usuario);
 
+        log.info("Usuario desactivado exitosamente con ID: {}", usuarioId);
         return "Usuario Desactivado correctamente";
     }
 }

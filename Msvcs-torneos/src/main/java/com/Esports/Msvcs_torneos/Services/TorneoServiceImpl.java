@@ -18,11 +18,14 @@ import java.util.List;
 @Transactional
 public class TorneoServiceImpl implements TorneoService {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TorneoServiceImpl.class);
+
     @Autowired
     private TorneosRepository torneoRepository;
 
     @Override
     public TorneoResponseDTO crearTorneo(CrearTorneoDTO dto) {
+        log.info("Creando torneo con nombre: {}", dto.getNombretorneo());
         // Regla: fechaFin debe ser posterior a fechaInicio
         if (!dto.getFechaFin().isAfter(dto.getFechaInicio())) {
             throw new BadRequestException("La fecha de fin debe ser posterior a la fecha de inicio");
@@ -53,11 +56,13 @@ public class TorneoServiceImpl implements TorneoService {
         response.setModalidadTorneo(torneo.getModalidadTorneo());
         response.setEstadoTorneo(torneo.getEstadoTorneo());
 
+        log.info("Torneo creado exitosamente con ID: {}", torneo.getTorneoId());
         return response;
     }
 
     @Override
     public List<TorneoResponseDTO> listarTorneos() {
+        log.info("Listando todos los torneos");
         List<Torneo> torneos = torneoRepository.findAll();
         return torneos.stream().map(torneo -> {
             TorneoResponseDTO dto = new TorneoResponseDTO();
@@ -75,8 +80,11 @@ public class TorneoServiceImpl implements TorneoService {
 
     @Override
     public TorneoResponseDTO buscarTorneo(Long id) {
-        Torneo torneo = torneoRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Torneo no encontrado"));
+        log.info("Buscando torneo con ID: {}", id);
+        Torneo torneo = torneoRepository.findById(id).orElseThrow(() -> {
+            log.warn("Torneo no encontrado con ID: {}", id);
+            return new ResourceNotFoundException("Torneo no encontrado");
+        });
 
         TorneoResponseDTO dto = new TorneoResponseDTO();
         dto.setTorneoId(torneo.getTorneoId());
@@ -88,11 +96,13 @@ public class TorneoServiceImpl implements TorneoService {
         dto.setModalidadTorneo(torneo.getModalidadTorneo());
         dto.setEstadoTorneo(torneo.getEstadoTorneo());
 
+        log.info("Torneo encontrado: {}", torneo.getNombretorneo());
         return dto;
     }
 
     @Override
     public TorneoResponseDTO actualizarTorneo(Long id, ActualizarTorneoDTO dto) {
+        log.info("Actualizando torneo con ID: {}", id);
         Torneo torneo = torneoRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Torneo no encontrado"));
 
@@ -127,28 +137,33 @@ public class TorneoServiceImpl implements TorneoService {
         response.setModalidadTorneo(torneo.getModalidadTorneo());
         response.setEstadoTorneo(torneo.getEstadoTorneo());
 
+        log.info("Torneo actualizado exitosamente con ID: {}", id);
         return response;
     }
 
     @Override
     public String cerrarTorneo(Long id) {
+        log.info("Cerrando torneo con ID: {}", id);
         Torneo torneo = torneoRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Torneo no encontrado"));
 
         torneo.setEstadoTorneo("CERRADO");
         torneoRepository.save(torneo);
 
+        log.info("Torneo cerrado exitosamente con ID: {}", id);
         return "Torneo cerrado correctamente";
     }
 
     @Override
     public String cancelarTorneo(Long id) {
+        log.info("Cancelando torneo con ID: {}", id);
         Torneo torneo = torneoRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Torneo no encontrado"));
 
         torneo.setEstadoTorneo("CANCELADO");
         torneoRepository.save(torneo);
 
+        log.warn("Torneo cancelado con ID: {}", id);
         return "Torneo cancelado correctamente";
     }
 }
