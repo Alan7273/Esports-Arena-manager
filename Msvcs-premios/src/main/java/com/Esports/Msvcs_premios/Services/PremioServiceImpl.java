@@ -19,6 +19,7 @@ import java.util.List;
 @Transactional
 public class PremioServiceImpl implements PremioService {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PremioServiceImpl.class);
     @Autowired
     private PremioRepository premioRepository;
 
@@ -27,6 +28,7 @@ public class PremioServiceImpl implements PremioService {
 
     @Override
     public PremioResponseDTO crearPremio(CrearPremioDTO dto) {
+        log.info("Creando premio para torneoId: {} - posicion: {}", dto.getTorneoId(), dto.getPosicion());
         Premio premio = new Premio();
         premio.setTorneoId(dto.getTorneoId());
         premio.setPosicion(dto.getPosicion());
@@ -44,11 +46,13 @@ public class PremioServiceImpl implements PremioService {
         response.setValor(premio.getValor());
         response.setEstado(premio.getEstado());
 
+        log.info("Premio creado exitosamente con ID: {}", premio.getPremioId());
         return response;
     }
 
     @Override
     public List<PremioResponseDTO> listarPremios() {
+        log.info("Listando todos los premios");
         return premioRepository.findAll().stream().map(premio -> {
             PremioResponseDTO dto = new PremioResponseDTO();
             dto.setPremioId(premio.getPremioId());
@@ -63,8 +67,11 @@ public class PremioServiceImpl implements PremioService {
 
     @Override
     public PremioResponseDTO buscarPremio(Long id) {
-        Premio premio = premioRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Premio no encontrado"));
+        log.info("Buscando premio con ID: {}", id);
+        Premio premio = premioRepository.findById(id).orElseThrow(() -> {
+            log.warn("Premio no encontrado con ID: {}", id);
+            return new ResourceNotFoundException("Premio no encontrado");
+        });
 
         PremioResponseDTO dto = new PremioResponseDTO();
         dto.setPremioId(premio.getPremioId());
@@ -79,6 +86,7 @@ public class PremioServiceImpl implements PremioService {
 
     @Override
     public PremioResponseDTO actualizarPremio(Long id, ActualizarPremioDTO dto) {
+        log.info("Actualizando premio con ID: {}", id);
         Premio premio = premioRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Premio no encontrado"));
 
@@ -98,11 +106,13 @@ public class PremioServiceImpl implements PremioService {
         response.setValor(premio.getValor());
         response.setEstado(premio.getEstado());
 
+        log.info("Premio ID: {} actualizado exitosamente", id);
         return response;
     }
 
     @Override
     public String asignarPremio(Long id, Long participanteId) {
+        log.info("Asignando premio ID: {} al participanteId: {}", id, participanteId);
         Premio premio = premioRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Premio no encontrado"));
 
@@ -116,6 +126,7 @@ public class PremioServiceImpl implements PremioService {
         premio.setEstado("ASIGNADO");
         premioRepository.save(premio);
 
+        log.info("Premio ID: {} asignado al participanteId: {}", id, participanteId);
         return "Premio asignado correctamente";
     }
 }

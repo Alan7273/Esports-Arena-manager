@@ -21,6 +21,7 @@ import java.util.List;
 @Transactional
 public class InscripcionesServiceImpl implements InscripcionesService {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InscripcionesServiceImpl.class);
     @Autowired
     private InscripcionRepository inscripcionRepository;
 
@@ -35,6 +36,7 @@ public class InscripcionesServiceImpl implements InscripcionesService {
 
     @Override
     public InscripcionResponseDTO crearInscripcion(CrearInscripcionDTO dto) {
+        log.info("Creando inscripcion para torneoId: {} - participante: {}", dto.getTorneoId(), dto.getNombreJugador());
         if (!torneoClient.existeTorneo(dto.getTorneoId())) {
             throw new ResourceNotFoundException("El torneo no existe");
         }
@@ -83,11 +85,13 @@ public class InscripcionesServiceImpl implements InscripcionesService {
         response.setEstado(inscripcion.getEstado());
         response.setFechaInscripcion(inscripcion.getFechaInscripcion());
 
+        log.info("Inscripcion creada exitosamente con ID: {}", inscripcion.getInscripcionId());
         return response;
     }
 
     @Override
     public List<InscripcionResponseDTO> listarInscripciones() {
+        log.info("Listando todas las inscripciones");
         List<Inscripcion> inscripcions = inscripcionRepository.findAll();
         return inscripcions.stream().map(inscripcion -> {
             InscripcionResponseDTO dto = new InscripcionResponseDTO();
@@ -105,8 +109,11 @@ public class InscripcionesServiceImpl implements InscripcionesService {
 
     @Override
     public InscripcionResponseDTO buscarInscripcion(Long id) {
-        Inscripcion inscripcion = inscripcionRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Inscripcion no encontrada"));
+        log.info("Buscando inscripcion con ID: {}", id);
+        Inscripcion inscripcion = inscripcionRepository.findById(id).orElseThrow(() -> {
+            log.warn("Inscripcion no encontrada con ID: {}", id);
+            return new ResourceNotFoundException("Inscripcion no encontrada");
+        });
 
         InscripcionResponseDTO dto = new InscripcionResponseDTO();
         dto.setInscripcionId(inscripcion.getInscripcionId());
@@ -123,6 +130,7 @@ public class InscripcionesServiceImpl implements InscripcionesService {
 
     @Override
     public InscripcionResponseDTO actualizarEstado(Long id, String estado) {
+        log.info("Actualizando estado de inscripcion ID: {} a: {}", id, estado);
         Inscripcion inscripcion = inscripcionRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Inscripcion no encontrada"));
 
@@ -139,17 +147,20 @@ public class InscripcionesServiceImpl implements InscripcionesService {
         dto.setEstado(estado);
         dto.setFechaInscripcion(inscripcion.getFechaInscripcion());
 
+        log.info("Estado de inscripcion ID: {} actualizado a: {}", id, estado);
         return  dto;
     }
 
     @Override
     public String cancelarInscripcion(Long id) {
+        log.warn("Cancelando inscripcion con ID: {}", id);
         Inscripcion inscripcion = inscripcionRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Inscripcion no encontrada"));
 
         inscripcion.setEstado("CANCELADA");
         inscripcionRepository.save(inscripcion);
 
+        log.warn("Inscripcion ID: {} cancelada", id);
         return "Inscripcion cancelada";
     }
 }

@@ -18,6 +18,7 @@ import java.util.List;
 @Transactional
 public class PartidaServiceImpl implements PartidaService {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PartidaServiceImpl.class);
     @Autowired
     private PartidaRepository partidaRepository;
 
@@ -29,6 +30,7 @@ public class PartidaServiceImpl implements PartidaService {
 
     @Override
     public PartidaResponseDTO crearPartida(CrearPartidaDTO dto) {
+        log.info("Creando partida para torneoId: {} - ronda: {}", dto.getTorneoId(), dto.getRonda());
         if (!torneoClient.existeTorneo(dto.getTorneoId())) {
             throw new ResourceNotFoundException("El torneo no existe");
         }
@@ -58,11 +60,13 @@ public class PartidaServiceImpl implements PartidaService {
         response.setFechaHora(partida.getFechaHora());
         response.setEstadopartida(partida.getEstadopartida());
 
+        log.info("Partida creada exitosamente con ID: {}", partida.getPartidaId());
         return response;
     }
 
     @Override
     public List<PartidaResponseDTO> listarPartidas() {
+        log.info("Listando todas las partidas");
         List<Partida> partidas = partidaRepository.findAll();
 
         return partidas.stream().map(partida -> {
@@ -82,8 +86,11 @@ public class PartidaServiceImpl implements PartidaService {
 
     @Override
     public PartidaResponseDTO buscarPartida(Long partidaId) {
-        Partida partida = partidaRepository.findById(partidaId).orElseThrow(
-                () -> new ResourceNotFoundException("Partida no encontrada"));
+        log.info("Buscando partida con ID: {}", partidaId);
+        Partida partida = partidaRepository.findById(partidaId).orElseThrow(() -> {
+            log.warn("Partida no encontrada con ID: {}", partidaId);
+            return new ResourceNotFoundException("Partida no encontrada");
+        });
 
         PartidaResponseDTO dto = new PartidaResponseDTO();
 
@@ -100,6 +107,7 @@ public class PartidaServiceImpl implements PartidaService {
 
     @Override
     public PartidaResponseDTO actualizarHorario(Long partidaId, LocalDateTime fechaHora) {
+        log.info("Actualizando horario de partida ID: {}", partidaId);
         Partida partida = partidaRepository.findById(partidaId).orElseThrow(
                 () -> new ResourceNotFoundException("Partida no encontrada"));
 
@@ -117,11 +125,13 @@ public class PartidaServiceImpl implements PartidaService {
         dto.setFechaHora(partida.getFechaHora());
         dto.setEstadopartida(partida.getEstadopartida());
 
+        log.info("Horario de partida ID: {} actualizado exitosamente", partidaId);
         return dto;
     }
 
     @Override
     public String cancelarPartida(Long partidaId) {
+        log.warn("Cancelando partida con ID: {}", partidaId);
         Partida partida = partidaRepository.findById(partidaId).orElseThrow(
                 () -> new ResourceNotFoundException("Partida no encontrada"));
 
@@ -129,6 +139,7 @@ public class PartidaServiceImpl implements PartidaService {
 
         partidaRepository.save(partida);
 
+        log.warn("Partida ID: {} cancelada", partidaId);
         return "Partida cancelada correctamente";
     }
 }

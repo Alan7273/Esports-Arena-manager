@@ -17,6 +17,7 @@ import java.util.List;
 @Transactional
 public class SancionesServiceImpl implements SancionesService {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SancionesServiceImpl.class);
     @Autowired
     private SancionesRepository sancionRepository;
 
@@ -25,6 +26,7 @@ public class SancionesServiceImpl implements SancionesService {
 
     @Override
     public SancionResponseDTO crearSancion(CrearSancionDTO dto) {
+        log.info("Creando sancion para usuarioId: {} - motivo: {}", dto.getUsuarioId(), dto.getMotivo());
         if(!usuarioClient.existeUsuario(dto.getUsuarioId())){
             throw new ResourceNotFoundException("El usuario sancionado no existe");
         }
@@ -50,11 +52,13 @@ public class SancionesServiceImpl implements SancionesService {
         response.setEstadoSancion(sancion.getEstadoSancion());
         response.setSeveridad(sancion.getSeveridad());
 
+        log.warn("Sancion creada con ID: {} para usuarioId: {}", sancion.getSancionId(), sancion.getUsuarioId());
         return response;
     }
 
     @Override
     public List<SancionResponseDTO> listarSanciones() {
+        log.info("Listando todas las sanciones");
         return sancionRepository.findAll().stream().map(sancion -> {
             SancionResponseDTO dto = new SancionResponseDTO();
             dto.setSancionId(sancion.getSancionId());
@@ -73,8 +77,11 @@ public class SancionesServiceImpl implements SancionesService {
 
     @Override
     public SancionResponseDTO buscarSancion(Long id) {
-        Sancion sancion = sancionRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Sanción no encontrada"));
+        log.info("Buscando sancion con ID: {}", id);
+        Sancion sancion = sancionRepository.findById(id).orElseThrow(() -> {
+            log.warn("Sancion no encontrada con ID: {}", id);
+            return new ResourceNotFoundException("Sanción no encontrada");
+        });
 
         SancionResponseDTO dto = new SancionResponseDTO();
         dto.setSancionId(sancion.getSancionId());
@@ -91,6 +98,7 @@ public class SancionesServiceImpl implements SancionesService {
 
     @Override
     public String cerrarSancion(Long id) {
+        log.info("Cerrando sancion con ID: {}", id);
         Sancion sancion = sancionRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Sanción no encontrada"));
 
@@ -98,16 +106,21 @@ public class SancionesServiceImpl implements SancionesService {
 
         sancionRepository.save(sancion);
 
+        log.info("Sancion ID: {} cerrada exitosamente", id);
         return "Sanción cerrada";
     }
 
     @Override
     public Boolean validarSancionActiva(Long usuarioId) {
-        return sancionRepository.existsByUsuarioIdAndEstadoSancion(usuarioId, "ACTIVA");
+        log.info("Validando sancion activa para usuarioId: {}", usuarioId);
+        Boolean resultado = sancionRepository.existsByUsuarioIdAndEstadoSancion(usuarioId, "ACTIVA");
+        log.info("Resultado validacion sancion usuarioId {}: {}", usuarioId, resultado);
+        return resultado;
     }
 
     @Override
     public SancionResponseDTO actualizarSancion(Long id, ActualizarSancionDTO dto) {
+        log.info("Actualizando sancion con ID: {}", id);
         Sancion sancion = sancionRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Sanción no encontrada"));
 
@@ -129,6 +142,7 @@ public class SancionesServiceImpl implements SancionesService {
         response.setEstadoSancion(sancion.getEstadoSancion());
         response.setSeveridad(sancion.getSeveridad());
 
+        log.info("Sancion ID: {} actualizada exitosamente", id);
         return response;
     }
 }

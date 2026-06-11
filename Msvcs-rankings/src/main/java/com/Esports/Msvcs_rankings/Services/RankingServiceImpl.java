@@ -14,11 +14,13 @@ import java.util.List;
 @Transactional
 public class RankingServiceImpl implements RankingService {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RankingServiceImpl.class);
     @Autowired
     private RankingsRepository rankingRepository;
 
     @Override
     public String crearRankingParticipante(Long torneoId, Long participanteId) {
+        log.info("Creando ranking para torneoId: {} - participanteId: {}", torneoId, participanteId);
         Ranking ranking = new Ranking();
         ranking.setTorneoId(torneoId);
         ranking.setParticipanteId(participanteId);
@@ -28,11 +30,14 @@ public class RankingServiceImpl implements RankingService {
         ranking.setDiferencia(0);
         ranking.setPosicion(0);
         rankingRepository.save(ranking);
+
+        log.info("Ranking creado para participante: {}", participanteId);
         return "Ranking creado para participante " + participanteId;
     }
 
     @Override
     public List<RankingResponseDTO> obtenerTabla(Long torneoId) {
+        log.info("Obteniendo tabla de ranking para torneoId: {}", torneoId);
         return rankingRepository.findByTorneoId(torneoId).stream().map(ranking -> {
             RankingResponseDTO dto = new RankingResponseDTO();
             dto.setRankingId(ranking.getRankingId());
@@ -49,8 +54,11 @@ public class RankingServiceImpl implements RankingService {
 
     @Override
     public RankingResponseDTO buscarRanking(Long id) {
-        Ranking ranking = rankingRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Ranking no encontrado"));
+        log.info("Buscando ranking con ID: {}", id);
+        Ranking ranking = rankingRepository.findById(id).orElseThrow(() -> {
+            log.warn("Ranking no encontrado con ID: {}", id);
+            return new ResourceNotFoundException("Ranking no encontrado");
+        });
 
         RankingResponseDTO dto = new RankingResponseDTO();
         dto.setRankingId(ranking.getRankingId());
@@ -67,6 +75,7 @@ public class RankingServiceImpl implements RankingService {
 
     @Override
     public String actualizarRanking(Long torneoId) {
+        log.info("Actualizando ranking para torneoId: {}", torneoId);
         List<Ranking> rankings = rankingRepository.findByTorneoId(torneoId);
 
         if (rankings.isEmpty()) {
@@ -81,11 +90,13 @@ public class RankingServiceImpl implements RankingService {
 
         rankingRepository.saveAll(rankings);
 
+        log.info("Ranking del torneoId: {} actualizado exitosamente", torneoId);
         return "Ranking actualizado correctamente";
     }
 
     @Override
     public String reiniciarRanking(Long torneoId) {
+        log.warn("Reiniciando ranking para torneoId: {}", torneoId);
         List<Ranking> rankings = rankingRepository.findByTorneoId(torneoId);
 
         if (rankings.isEmpty()) {
@@ -102,6 +113,7 @@ public class RankingServiceImpl implements RankingService {
 
         rankingRepository.saveAll(rankings);
 
+        log.warn("Ranking del torneoId: {} reiniciado", torneoId);
         return "Ranking reiniciado correctamente";
     }
 }

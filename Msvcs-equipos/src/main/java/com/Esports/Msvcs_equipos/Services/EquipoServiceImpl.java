@@ -97,6 +97,7 @@ public class EquipoServiceImpl implements EquipoService {
 
     @Override
     public MiembroEquipoResponseDTO agregarMiembro(Long equipoId, AgregarMiembroDTO dto) {
+        log.info("Agregando miembro usuarioId: {} al equipo ID: {}", dto.getUsuarioId(), equipoId);
         if (!usuarioClient.existeUsuario(dto.getUsuarioId())){
             throw new ResourceNotFoundException("El usuario no existe");
         }
@@ -121,21 +122,25 @@ public class EquipoServiceImpl implements EquipoService {
         response.setRolDentroEquipo(miembro.getRolDentroEquipo());
         response.setFechaIngreso(miembro.getFechaIngreso());
 
+        log.info("Miembro agregado exitosamente al equipo ID: {}", equipoId);
         return response;
     }
 
     @Override
     public String eliminarMiembro(Long equipoId, Long usuarioId) {
+        log.warn("Eliminando miembro usuarioId: {} del equipo ID: {}", usuarioId, equipoId);
         Miembro_equipo miembro = miembroEquipoRepository.findByEquipoIdAndUsuarioId(equipoId, usuarioId).orElseThrow(
                 () -> new ResourceNotFoundException("Miembro no encontrado"));
 
         miembroEquipoRepository.delete(miembro);
 
+        log.warn("Miembro usuarioId: {} eliminado del equipo ID: {}", usuarioId, equipoId);
         return "Miembro eliminado";
     }
 
     @Override
     public EquipoResponseDTO actualizarCapitan(Long equipoId, Long capitanId) {
+        log.info("Actualizando capitan del equipo ID: {} al usuarioId: {}", equipoId, capitanId);
         Equipos equipos = equiposRepository.findById(equipoId).orElseThrow(
                 () -> new ResourceNotFoundException("Equipo no encontrado")
         );
@@ -151,17 +156,20 @@ public class EquipoServiceImpl implements EquipoService {
         response.setJuegoprincipalId(equipos.getJuegoprincipalId());
         response.setEstadoequipo(equipos.getEstadoequipo());
 
+        log.info("Capitan del equipo ID: {} actualizado exitosamente", equipoId);
         return response;
     }
 
     @Override
     public String desactivarEquipo(Long id) {
+        log.warn("Desactivando equipo con ID: {}", id);
         Equipos equipos = equiposRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Equipo no encontrado"));
 
         equipos.setEstadoequipo("INACTIVO");
         equiposRepository.save(equipos);
 
+        log.warn("Equipo ID: {} desactivado", id);
         return "Equipo desactivado correctamente";
     }
 }

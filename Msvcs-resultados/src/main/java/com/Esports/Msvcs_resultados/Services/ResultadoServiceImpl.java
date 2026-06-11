@@ -20,6 +20,7 @@ import java.util.List;
 @Transactional
 public class ResultadoServiceImpl implements ResultadoService {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ResultadoServiceImpl.class);
     @Autowired
     private ResultadosRepository resultadosRepository;
 
@@ -28,7 +29,7 @@ public class ResultadoServiceImpl implements ResultadoService {
 
     @Override
     public ResultadoResponseDTO registrarResultado(CrearResultadoDTO dto) {
-
+        log.info("Registrando resultado para partidaId: {} - ganadorId: {}", dto.getPartidaId(), dto.getGanadorId());
         // Regla: la partida debe existir y estar FINALIZADA o EN_CURSO
         PartidaResponseDTO partida = partidaClient.buscarPartida(dto.getPartidaId());
         if (partida.getEstadopartida().equals("CANCELADA")) {
@@ -63,11 +64,13 @@ public class ResultadoServiceImpl implements ResultadoService {
         response.setEstadoValidacion(resultado.getEstadoValidacion());
         response.setFechaRegistro(resultado.getFechaRegistro());
 
+        log.info("Resultado registrado exitosamente con ID: {}", resultado.getResultadoId());
         return response;
     }
 
     @Override
     public List<ResultadoResponseDTO> listarResultados() {
+        log.info("Listando todos los resultados");
         return resultadosRepository.findAll().stream().map(resultado -> {
             ResultadoResponseDTO dto = new ResultadoResponseDTO();
             dto.setResultadoId(resultado.getResultadoId());
@@ -83,8 +86,11 @@ public class ResultadoServiceImpl implements ResultadoService {
 
     @Override
     public ResultadoResponseDTO buscarResultado(Long id) {
-        Resultado resultado = resultadosRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Resultado no encontrado"));
+        log.info("Buscando resultado con ID: {}", id);
+        Resultado resultado = resultadosRepository.findById(id).orElseThrow(() -> {
+            log.warn("Resultado no encontrado con ID: {}", id);
+            return new ResourceNotFoundException("Resultado no encontrado");
+        });
 
         ResultadoResponseDTO dto = new ResultadoResponseDTO();
         dto.setResultadoId(resultado.getResultadoId());
@@ -100,6 +106,7 @@ public class ResultadoServiceImpl implements ResultadoService {
 
     @Override
     public ResultadoResponseDTO actualizarResultado(Long id, ActualizarResultadoDTO dto) {
+        log.info("Actualizando resultado con ID: {}", id);
         Resultado resultado = resultadosRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Resultado no encontrado"));
 
@@ -121,22 +128,26 @@ public class ResultadoServiceImpl implements ResultadoService {
         response.setEstadoValidacion(resultado.getEstadoValidacion());
         response.setFechaRegistro(resultado.getFechaRegistro());
 
+        log.info("Resultado ID: {} actualizado exitosamente", id);
         return response;
     }
 
     @Override
     public String validarResultado(Long id) {
+        log.info("Validando resultado con ID: {}", id);
         Resultado resultado = resultadosRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Resultado no encontrado"));
 
         resultado.setEstadoValidacion("VALIDADO");
         resultadosRepository.save(resultado);
 
+        log.info("Resultado ID: {} marcado como VALIDADO", id);
         return "Resultado validado";
     }
 
     @Override
     public String anularResultado(Long id) {
+        log.warn("Anulando resultado con ID: {}", id);
         Resultado resultado = resultadosRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Resultado no encontrado"));
 
@@ -144,6 +155,7 @@ public class ResultadoServiceImpl implements ResultadoService {
 
         resultadosRepository.save(resultado);
 
+        log.warn("Resultado ID: {} anulado", id);
         return "Resultado anulado";
     }
 }

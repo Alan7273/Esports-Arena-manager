@@ -17,6 +17,7 @@ import java.util.List;
 @Transactional
 public class NotificacionServiceImpl implements NotificacionService {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NotificacionServiceImpl.class);
     @Autowired
     private NotificacionRepository notificacionRepository;
 
@@ -25,6 +26,7 @@ public class NotificacionServiceImpl implements NotificacionService {
 
     @Override
     public NotificacionResponseDTO crearNotificacion(CrearNotificacionDTO dto) {
+        log.info("Creando notificacion para usuarioId: {} - tipo: {}", dto.getUsuarioId(), dto.getTipo());
         if (!usuarioClient.existeUsuario(dto.getUsuarioId())){
             throw new ResourceNotFoundException("El usuario destinatario no existe");
         }
@@ -49,11 +51,13 @@ public class NotificacionServiceImpl implements NotificacionService {
         response.setLeidaNotificacion(notificacion.getLeidaNotificacion());
         response.setFecha(notificacion.getFecha());
 
+        log.info("Notificacion creada exitosamente con ID: {}", notificacion.getNotificacionId());
         return response;
     }
 
     @Override
     public List<NotificacionResponseDTO> listarUsuario(Long usuarioId) {
+        log.info("Listando notificaciones del usuarioId: {}", usuarioId);
         List<Notificacion> notificaciones = notificacionRepository.findByUsuarioId(usuarioId);
 
         return notificaciones.stream().map(notificacion -> {
@@ -73,8 +77,11 @@ public class NotificacionServiceImpl implements NotificacionService {
 
     @Override
     public NotificacionResponseDTO buscarNotificacion(Long notificacionId) {
-        Notificacion notificacion = notificacionRepository.findById(notificacionId).orElseThrow(
-                () -> new ResourceNotFoundException("Notificación no encontrada"));
+        log.info("Buscando notificacion con ID: {}", notificacionId);
+        Notificacion notificacion = notificacionRepository.findById(notificacionId).orElseThrow(() -> {
+            log.warn("Notificacion no encontrada con ID: {}", notificacionId);
+            return new ResourceNotFoundException("Notificación no encontrada");
+        });
 
         NotificacionResponseDTO dto = new NotificacionResponseDTO();
 
@@ -91,6 +98,7 @@ public class NotificacionServiceImpl implements NotificacionService {
 
     @Override
     public String marcarLeida(Long notificacionId) {
+        log.info("Marcando como leida la notificacion ID: {}", notificacionId);
         Notificacion notificacion = notificacionRepository.findById(notificacionId).orElseThrow(
                 () -> new ResourceNotFoundException("Notificación no encontrada"));
 
@@ -98,16 +106,19 @@ public class NotificacionServiceImpl implements NotificacionService {
 
         notificacionRepository.save(notificacion);
 
+        log.info("Notificacion ID: {} marcada como leida", notificacionId);
         return "Notificación marcada como leída";
     }
 
     @Override
     public String eliminarNotificacion(Long id) {
+        log.warn("Eliminando notificacion con ID: {}", id);
         Notificacion notificacion = notificacionRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Notificación no encontrada"));
 
         notificacionRepository.delete(notificacion);
 
+        log.warn("Notificacion ID: {} eliminada", id);
         return "Notificación eliminada";
     }
 }
