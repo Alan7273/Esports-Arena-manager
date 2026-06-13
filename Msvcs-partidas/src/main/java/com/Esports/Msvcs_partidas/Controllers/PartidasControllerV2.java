@@ -24,7 +24,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 
 @RestController
-@RequestMapping("/api/v1/partidas")
+@RequestMapping("/api/v2/partidas")
 @Validated
 @Tag(name = "Partidas V2", description = "Operaciones HATEOAS del microservicio de Partidas")
 public class PartidasControllerV2 {

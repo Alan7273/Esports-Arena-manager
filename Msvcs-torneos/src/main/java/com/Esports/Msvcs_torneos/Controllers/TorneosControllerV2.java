@@ -23,7 +23,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/api/v1/torneos")
+@RequestMapping("/api/v2/torneos")
 @Validated
 @Tag(name = "Torneos V2", description = "Operaciones HATEOAS del microservicio de Torneos")
 public class TorneosControllerV2 {
