@@ -11,8 +11,8 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("API Esports - Juegos")
+                        .title("API Esports-Arena-Manager - Usuarios")
                         .version("1.0")
-                        .description("Documentación de la API del microservicio de Juegos"));
+                        .description("Documentación de la API del microservicio de Usuarios"));
     }
 }
