@@ -1,7 +1,6 @@
 package com.Esports.Msvcs_equipos.Controllers;
+
 import com.Esports.Msvcs_equipos.Services.EquipoService;
-import com.Esports.Msvcs_equipos.models.Equipos;
-import com.Esports.Msvcs_equipos.models.Miembro_equipo;
 import com.Esports.Msvcs_equipos.models.dtos.AgregarMiembroDTO;
 import com.Esports.Msvcs_equipos.models.dtos.CrearEquipoDTO;
 import com.Esports.Msvcs_equipos.models.dtos.EquipoResponseDTO;

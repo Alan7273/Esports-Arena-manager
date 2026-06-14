@@ -53,7 +53,7 @@ public class UsuarioServiceTest {
             Usuario usuario = new Usuario();
             usuario.setUsuarioId((long) (i + 2));
             usuario.setNombreusuario(faker.name().fullName());
-            usuario.setNickname(faker.name().username());
+            usuario.setNickname(faker.name().fullName());
             usuario.setCorreo(faker.internet().emailAddress());
             usuario.setRol("JUGADOR");
             usuario.setEstadousuario("ACTIVO");
