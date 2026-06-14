@@ -88,10 +88,10 @@ public class SancionesServiceImpl implements SancionesService {
         dto.setUsuarioId(sancion.getUsuarioId());
         dto.setEquipoId(sancion.getEquipoId());
         dto.setMotivo(sancion.getMotivo());
-        sancion.setFechaInicio(sancion.getFechaInicio());
-        sancion.setFechaFin(sancion.getFechaFin());
-        sancion.setEstadoSancion(sancion.getEstadoSancion());
-        sancion.setSeveridad(sancion.getSeveridad());
+        dto.setFechaInicio(sancion.getFechaInicio());
+        dto.setFechaFin(sancion.getFechaFin());
+        dto.setEstadoSancion(sancion.getEstadoSancion());
+        dto.setSeveridad(sancion.getSeveridad());
 
         return dto;
     }
