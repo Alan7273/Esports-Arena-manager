@@ -59,6 +59,11 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
+		<!-- Circuit breaker requerido para que el atributo 'fallback' de los Feign clients funcione -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+		</dependency>
 		<!-- Cliente Eureka: este microservicio se registra en el servidor de descubrimiento -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
