@@ -57,15 +57,109 @@ spring:
                 # las consume. Usan el prefijo /api-docs/<svc> (NO /v3/api-docs) para no chocar con
                 # el /v3/api-docs propio del gateway. RewritePath lo traduce al /v3/api-docs real del servicio.
 
-              - id: -api-docs
-                uri: lb://Msvcs-
+              - id: equipos-api-docs
+                uri: lb://Msvcs-equipos
                 predicates:
-                  - Path=/api-docs/
+                  - Path=/api-docs/equipos
                 filters:
-                  - RewritePath=/api-docs/
-                  - id: -api-docs
-                    uri: lb://Msvcs-
-                    predicates:
-                      - Path=/api-docs/
-                    filters:
-                      - RewritePath=/api-docs/
+                  - RewritePath=/api-docs/equipos, /v3/api-docs
+              - id: inscripciones-api-docs
+                uri: lb://Msvcs-inscripciones
+                predicates:
+                  - Path=/api-docs/inscripciones
+                filters:
+                  - RewritePath=/api-docs/inscripciones, /v3/api-docs
+              - id: juegos-api-docs
+                uri: lb://Msvcs-juegos
+                predicates:
+                  - Path=/api-docs/juegos
+                filters:
+                  - RewritePath=/api-docs/juegos, /v3/api-docs
+              - id: notificaciones-api-docs
+                uri: lb://Msvcs-notificaciones
+                predicates:
+                  - Path=/api-docs/notificaciones
+                filters:
+                  - RewritePath=/api-docs/notificaciones, /v3/api-docs
+              - id: partidas-api-docs
+                uri: lb://Msvcs-partidas
+                predicates:
+                  - Path=/api-docs/partidas
+                filters:
+                  - RewritePath=/api-docs/partidas, /v3/api-docs
+              - id: premios-api-docs
+                uri: lb://Msvcs-premios
+                predicates:
+                  - Path=/api-docs/premios
+                filters:
+                  - RewritePath=/api-docs/premios, /v3/api-docs
+              - id: rankings-api-docs
+                uri: lb://Msvcs-rankings
+                predicates:
+                  - Path=/api-docs/rankings
+                filters:
+                  - RewritePath=/api-docs/rankings, /v3/api-docs
+              - id: resultados-api-docs
+                uri: lb://Msvcs-resultados
+                predicates:
+                  - Path=/api-docs/resultados
+                filters:
+                  - RewritePath=/api-docs/resultados, /v3/api-docs
+              - id: sanciones-api-docs
+                uri: lb://Msvcs-sanciones
+                predicates:
+                  - Path=/api-docs/sanciones
+                filters:
+                  - RewritePath=/api-docs/sanciones, /v3/api-docs
+              - id: torneos-api-docs
+                uri: lb://Msvcs-torneos
+                predicates:
+                  - Path=/api-docs/torneos
+                filters:
+                  - RewritePath=/api-docs/torneos, /v3/api-docs
+              - id: usuarios-api-docs
+                uri: lb://Msvcs-usuarios
+                predicates:
+                  - Path=/api-docs/usuarios
+                filters:
+                  - RewritePath=/api-docs/usuarios, /v3/api-docs
+
+# Punto de entrada unico: todo el trafico entra por aqui.
+server:
+  port: 8080
+
+# El gateway tambien es cliente Eureka para poder resolver los lb://
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+# Swagger UI agregado: una sola pagina con un desplegable para elegir el microservicio.
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /docs/swagger-ui.html
+    # El desplegable apunta a los docs de cada servicio (ruteados por el gateway via lb://).
+    urls:
+      - name: equipos
+        url: /api-docs/equipos
+      - name: inscripciones
+        url: /api-docs/inscripciones
+      - name: juegos
+        url: /api-docs/juegos
+      - name: notificaciones
+        url: /api-docs/notificaciones
+      - name: partidas
+        url: /api-docs/partidas
+      - name: premios
+        url: /api-docs/premios
+      - name: rankings
+        url: /api-docs/rankings
+      - name: resultados
+        url: /api-docs/resultados
+      - name: sanciones
+        url: /api-docs/sanciones
+      - name: torneos
+        url: /api-docs/torneos
+      - name: usuarios
+        url: /api-docs/usuarios
