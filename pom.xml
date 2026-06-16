@@ -33,6 +33,8 @@
         <module>Msvcs-sanciones</module>
         <module>Msvcs-torneos</module>
         <module>Msvcs-usuarios</module>
+        <module>Msvcs-eureka</module>
+        <module>Msvcs-gateway</module>
     </modules>
 
 </project>
