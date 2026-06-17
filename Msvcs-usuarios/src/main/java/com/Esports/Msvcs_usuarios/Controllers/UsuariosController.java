@@ -14,6 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
@@ -28,8 +32,17 @@ public class UsuariosController {
 
     @Operation(summary = "Crear un usuario")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos")
+            @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UsuarioResponseDTO.class),
+                            examples = @ExampleObject(value = """
+                {"usuarioId":7,"nombreusuario":"Carlos Pérez","nickname":"cperez99","correo":"carlos@email.com","rol":"JUGADOR","estadousuario":"ACTIVO","fechaRegistro":"2025-01-15"}
+                """))),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":400,"error":"Bad Request","message":"El correo debe tener un formato valido"}
+                """)))
     })
     @PostMapping
     public ResponseEntity<UsuarioResponseDTO> crearUsuario(@Valid @RequestBody CrearUsuarioDTO dto) {
@@ -48,7 +61,7 @@ public class UsuariosController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> buscarUsuario(@PathVariable Long id) {
+    public ResponseEntity<UsuarioResponseDTO> buscarUsuario(@Parameter(description = "ID del usuario", example = "7") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(usuarioService.BuscarPorId(id));
     }
 
@@ -58,17 +71,23 @@ public class UsuariosController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> actualizarUsuario(@PathVariable Long id, @Valid @RequestBody ActualizarUsuarioDTO dto) {
+    public ResponseEntity<UsuarioResponseDTO> actualizarUsuario(@Parameter(description = "ID del usuario a actualizar", example = "7") @PathVariable Long id, @Valid @RequestBody ActualizarUsuarioDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(usuarioService.actualizarUsuario(id, dto));
     }
 
     @Operation(summary = "Desactivar un usuario (borrado lógico)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Usuario desactivado"),
-            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+            @ApiResponse(responseCode = "200", description = "Usuario desactivado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "\"Usuario desactivado correctamente\""))),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":404,"error":"Not Found","message":"Usuario con id 99 no encontrado"}
+                """)))
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> desactivarUsuario(@PathVariable Long id) {
+    public ResponseEntity<String> desactivarUsuario(@Parameter(description = "ID del usuario a desactivar", example = "7") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(usuarioService.DesactivarUsuario(id));
     }
 

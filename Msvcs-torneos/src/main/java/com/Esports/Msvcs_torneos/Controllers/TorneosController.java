@@ -14,6 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
@@ -28,8 +32,17 @@ public class TorneosController {
 
     @Operation(summary = "Crear un torneo")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Torneo creado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Fechas inválidas")
+            @ApiResponse(responseCode = "201", description = "Torneo creado exitosamente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TorneoResponseDTO.class),
+                            examples = @ExampleObject(value = """
+                {"torneoId":2,"nombretorneo":"Copa Verano 2025","juegoId":1,"fechaInicio":"2025-07-01","fechaFin":"2025-07-15","cupoMaximo":16,"estadoTorneo":"ABIERTO","modalidadTorneo":"ELIMINACION_DIRECTA"}
+                """))),
+            @ApiResponse(responseCode = "400", description = "Fechas inválidas",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":400,"error":"Bad Request","message":"La fecha de fin debe ser posterior a la fecha de inicio"}
+                """)))
     })
     @PostMapping
     public ResponseEntity<TorneoResponseDTO> crearTorneo(@Valid @RequestBody CrearTorneoDTO dto) {
@@ -44,11 +57,20 @@ public class TorneosController {
 
     @Operation(summary = "Buscar torneo por ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Torneo encontrado"),
-            @ApiResponse(responseCode = "404", description = "Torneo no encontrado")
+            @ApiResponse(responseCode = "200", description = "Torneo encontrado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TorneoResponseDTO.class),
+                            examples = @ExampleObject(value = """
+                {"torneoId":2,"nombretorneo":"Copa Verano 2025","juegoId":1,"fechaInicio":"2025-07-01","fechaFin":"2025-07-15","cupoMaximo":16,"estadoTorneo":"ABIERTO","modalidadTorneo":"ELIMINACION_DIRECTA"}
+                """))),
+            @ApiResponse(responseCode = "404", description = "Torneo no encontrado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":404,"error":"Not Found","message":"Torneo con id 99 no encontrado"}
+                """)))
     })
     @GetMapping("/{id}")
-    public ResponseEntity<TorneoResponseDTO> buscarTorneo(@PathVariable Long id) {
+    public ResponseEntity<TorneoResponseDTO> buscarTorneo(@Parameter(description = "ID del torneo", example = "2") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(torneoService.buscarTorneo(id));
     }
 
@@ -59,7 +81,7 @@ public class TorneosController {
             @ApiResponse(responseCode = "404", description = "Torneo no encontrado")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<TorneoResponseDTO> actualizarTorneo(@Valid @PathVariable Long id,@RequestBody ActualizarTorneoDTO dto) {
+    public ResponseEntity<TorneoResponseDTO> actualizarTorneo(@Parameter(description = "ID del torneo", example = "2") @Valid @PathVariable Long id,@RequestBody ActualizarTorneoDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(torneoService.actualizarTorneo(id, dto));
     }
 
@@ -69,7 +91,7 @@ public class TorneosController {
             @ApiResponse(responseCode = "404", description = "Torneo no encontrado")
     })
     @DeleteMapping("/cerrar/{id}")
-    public ResponseEntity<String> cerrarTorneo(@PathVariable Long id) {
+    public ResponseEntity<String> cerrarTorneo(@Parameter(description = "ID del torneo a cerrar", example = "2") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(torneoService.cerrarTorneo(id));
     }
 
@@ -79,7 +101,7 @@ public class TorneosController {
             @ApiResponse(responseCode = "404", description = "Torneo no encontrado")
     })
     @DeleteMapping("/cancelar/{id}")
-    public ResponseEntity<String> cancelarTorneo(@PathVariable Long id) {
+    public ResponseEntity<String> cancelarTorneo(@Parameter(description = "ID del torneo a cancelar", example = "2") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(torneoService.cancelarTorneo(id));
     }
 

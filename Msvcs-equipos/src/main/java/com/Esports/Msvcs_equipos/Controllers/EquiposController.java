@@ -15,6 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
@@ -29,8 +33,17 @@ public class EquiposController {
 
     @Operation(summary = "Crear un equipo")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Equipo creado exitosamente"),
-            @ApiResponse(responseCode = "404", description = "Capitán o juego principal no existe")
+            @ApiResponse(responseCode = "201", description = "Equipo creado exitosamente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = EquipoResponseDTO.class),
+                            examples = @ExampleObject(value = """
+                {"equipoId":10,"nombreequipo":"Team Phantom","capitanId":3,"juegoprincipalId":1,"estadoequipo":"ACTIVO"}
+                """))),
+            @ApiResponse(responseCode = "404", description = "Capitán o juego principal no existe",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":404,"error":"Not Found","message":"Capitán con id 99 no encontrado"}
+                """)))
     })
     @PostMapping
     public ResponseEntity<EquipoResponseDTO> crearEquipo(@Valid @RequestBody CrearEquipoDTO dto) {
@@ -45,21 +58,39 @@ public class EquiposController {
 
     @Operation(summary = "Buscar equipo por ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Equipo encontrado"),
-            @ApiResponse(responseCode = "404", description = "Equipo no encontrado")
+            @ApiResponse(responseCode = "200", description = "Equipo encontrado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = EquipoResponseDTO.class),
+                            examples = @ExampleObject(value = """
+                {"equipoId":10,"nombreequipo":"Team Phantom","capitanId":3,"juegoprincipalId":1,"estadoequipo":"ACTIVO"}
+                """))),
+            @ApiResponse(responseCode = "404", description = "Equipo no encontrado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":404,"error":"Not Found","message":"Equipo con id 99 no encontrado"}
+                """)))
     })
     @GetMapping("/{id}")
-    public ResponseEntity<EquipoResponseDTO> buscarEquipo(@PathVariable Long id) {
+    public ResponseEntity<EquipoResponseDTO> buscarEquipo(@Parameter(description = "ID del equipo a buscar", example = "10") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(equipoService.buscarEquipo(id));
     }
 
     @Operation(summary = "Agregar miembro a un equipo")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Miembro agregado"),
-            @ApiResponse(responseCode = "404", description = "Equipo o usuario no encontrado")
+            @ApiResponse(responseCode = "200", description = "Miembro agregado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MiembroEquipoResponseDTO.class),
+                            examples = @ExampleObject(value = """
+                {"MiembroId":5,"equipoId":10,"usuarioId":7,"rolDentroEquipo":"Support","fechaIngreso":"2025-06-01T14:30:00"}
+                """))),
+            @ApiResponse(responseCode = "404", description = "Equipo o usuario no encontrado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":404,"error":"Not Found","message":"Usuario con id 99 no encontrado"}
+                """)))
     })
     @PostMapping("/{id}/miembros")
-    public ResponseEntity<MiembroEquipoResponseDTO> agregarMiembro(@PathVariable Long id, @Valid @RequestBody AgregarMiembroDTO dto) {
+    public ResponseEntity<MiembroEquipoResponseDTO> agregarMiembro(@Parameter(description = "ID del equipo", example = "10") @PathVariable Long id, @Valid @RequestBody AgregarMiembroDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(equipoService.agregarMiembro(id, dto));
     }
 
@@ -69,7 +100,8 @@ public class EquiposController {
             @ApiResponse(responseCode = "404", description = "Miembro no encontrado")
     })
     @DeleteMapping("/{equipoId}/miembros/{usuarioId}")
-    public ResponseEntity<Void> eliminarMiembro(@PathVariable Long equipoId, @PathVariable Long usuarioId) {
+    public ResponseEntity<Void> eliminarMiembro(@Parameter(description = "ID del equipo", example = "10") @PathVariable Long equipoId,
+                                                @Parameter(description = "ID del usuario a eliminar", example = "7") @PathVariable Long usuarioId) {
         equipoService.eliminarMiembro(equipoId, usuarioId);
         return ResponseEntity.noContent().build();
     }
@@ -80,17 +112,24 @@ public class EquiposController {
             @ApiResponse(responseCode = "404", description = "Equipo no encontrado")
     })
     @PutMapping("/capitan/{id}")
-    public ResponseEntity<EquipoResponseDTO> actualizarCapitan(@PathVariable Long id, @RequestParam Long capitanId) {
+    public ResponseEntity<EquipoResponseDTO> actualizarCapitan(@Parameter(description = "ID del equipo", example = "10") @PathVariable Long id,
+                                                               @Parameter(description = "ID del nuevo capitán", example = "5") @RequestParam Long capitanId) {
         return ResponseEntity.status(HttpStatus.OK).body(equipoService.actualizarCapitan(id, capitanId));
     }
 
     @Operation(summary = "Desactivar un equipo (borrado lógico)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Equipo desactivado"),
-            @ApiResponse(responseCode = "404", description = "Equipo no encontrado")
+            @ApiResponse(responseCode = "200", description = "Equipo desactivado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "\"Equipo desactivado correctamente\""))),
+            @ApiResponse(responseCode = "404", description = "Equipo no encontrado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":404,"error":"Not Found","message":"Equipo con id 99 no encontrado"}
+                """)))
     })
     @DeleteMapping("/desactivar/{id}")
-    public ResponseEntity<String> desactivarEquipo(@PathVariable Long id) {
+    public ResponseEntity<String> desactivarEquipo(@Parameter(description = "ID del equipo a desactivar", example = "10") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(equipoService.desactivarEquipo(id));
     }
 
