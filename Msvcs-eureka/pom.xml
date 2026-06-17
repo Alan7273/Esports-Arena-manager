@@ -29,6 +29,10 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.netflix.eureka</groupId>
+			<artifactId>eureka-client-jersey3</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>

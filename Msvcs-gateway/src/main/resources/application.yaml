@@ -126,7 +126,7 @@ spring:
 
 # Punto de entrada unico: todo el trafico entra por aqui.
 server:
-  port: 8080
+  port: 8091
 
 # El gateway tambien es cliente Eureka para poder resolver los lb://
 eureka:
