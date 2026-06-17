@@ -166,4 +166,4 @@ springdoc:
 
 # CLAVE SECRETA JWT: la MISMA que en msvc-usuarios y en los 3 microservicios. El gateway la usa para validar.
 jwt:
-  secret: clave-secreta-super-segura-para-jwt-Esports-Arena-Esports-2026-0616
+  secret: Gamefloo@$&+()0
