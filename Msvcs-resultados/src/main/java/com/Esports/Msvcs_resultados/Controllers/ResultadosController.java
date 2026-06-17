@@ -14,6 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
@@ -28,8 +32,17 @@ public class ResultadosController {
 
     @Operation(summary = "Registrar el resultado de una partida")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Resultado registrado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Partida cancelada, ganador inválido o resultado duplicado")
+            @ApiResponse(responseCode = "201", description = "Resultado registrado exitosamente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResultadoResponseDTO.class),
+                            examples = @ExampleObject(value = """
+                {"resultadoId":8,"partidaId":20,"ganadorId":10,"puntajeA":3,"puntajeB":1,"estadoValidacion":"PENDIENTE","fechaRegistro":"2025-07-05"}
+                """))),
+            @ApiResponse(responseCode = "400", description = "Partida cancelada, ganador inválido o resultado duplicado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":400,"error":"Bad Request","message":"Ya existe un resultado para esta partida"}
+                """)))
     })
     @PostMapping
     public ResponseEntity<ResultadoResponseDTO> registrarResultado(@Valid @RequestBody CrearResultadoDTO dto) {
@@ -48,7 +61,7 @@ public class ResultadosController {
             @ApiResponse(responseCode = "404", description = "Resultado no encontrado")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<ResultadoResponseDTO> buscarResultado(@PathVariable Long id) {
+    public ResponseEntity<ResultadoResponseDTO> buscarResultado(@Parameter(description = "ID del resultado", example = "8") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(resultadoService.buscarResultado(id));
     }
 
@@ -58,27 +71,39 @@ public class ResultadosController {
             @ApiResponse(responseCode = "404", description = "Resultado no encontrado")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<ResultadoResponseDTO> actualizarResultado(@PathVariable Long id, @Valid @RequestBody ActualizarResultadoDTO dto) {
+    public ResponseEntity<ResultadoResponseDTO> actualizarResultado(@Parameter(description = "ID del resultado", example = "8") @PathVariable Long id, @Valid @RequestBody ActualizarResultadoDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(resultadoService.actualizarResultado(id, dto));
     }
 
     @Operation(summary = "Validar un resultado")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Resultado validado"),
-            @ApiResponse(responseCode = "404", description = "Resultado no encontrado")
+            @ApiResponse(responseCode = "200", description = "Resultado validado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "\"Resultado validado correctamente\""))),
+            @ApiResponse(responseCode = "404", description = "Resultado no encontrado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":404,"error":"Not Found","message":"Resultado con id 99 no encontrado"}
+                """)))
     })
     @PutMapping("/validar/{id}")
-    public ResponseEntity<String> validarResultado(@PathVariable Long id) {
+    public ResponseEntity<String> validarResultado(@Parameter(description = "ID del resultado a validar", example = "8") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(resultadoService.validarResultado(id));
     }
 
     @Operation(summary = "Anular un resultado")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Resultado anulado"),
-            @ApiResponse(responseCode = "404", description = "Resultado no encontrado")
+            @ApiResponse(responseCode = "200", description = "Resultado anulado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "\"Resultado anulado correctamente\""))),
+            @ApiResponse(responseCode = "404", description = "Resultado no encontrado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":404,"error":"Not Found","message":"Resultado con id 99 no encontrado"}
+                """)))
     })
     @DeleteMapping("/anular/{id}")
-    public ResponseEntity<String> anularResultado(@PathVariable Long id) {
+    public ResponseEntity<String> anularResultado(@Parameter(description = "ID del resultado a anular", example = "8") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(resultadoService.anularResultado(id));
     }
 }
