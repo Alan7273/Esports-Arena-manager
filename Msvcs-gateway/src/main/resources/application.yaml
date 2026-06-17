@@ -9,47 +9,47 @@ spring:
             # a 'uri'. lb:// significa "busca este nombre en Eureka y balancea la carga".
             routes:
               - id: Msvcs-equipos
-                uri: lb://Msvcs-equipos
+                uri: lb://msvcs-equipos
                 predicates:
                   - Path=/api/v1/equipos/**,/api/v2/equipos/**
               - id: Msvcs-inscripciones
-                uri: lb://Msvcs-inscripciones
+                uri: lb://msvcs-inscripciones
                 predicates:
                   - Path=/api/v1/inscripciones/**,/api/v2/inscripciones/**
               - id: Msvcs-juegos
-                uri: lb://Msvcs-juegos
+                uri: lb://msvcs-juegos
                 predicates:
                   - Path=/api/v1/juegos/**,/api/v2/juegos/**
               - id: Msvcs-notificaciones
-                uri: lb://Msvcs-notificaciones
+                uri: lb://msvcs-notificaciones
                 predicates:
                   - Path=/api/v1/notificaciones/**,/api/v2/notificaciones/**
               - id: Msvcs-partidas
-                uri: lb://Msvcs-partidas
+                uri: lb://msvcs-partidas
                 predicates:
                   - Path=/api/v1/partidas/**,/api/v2/partidas/**
               - id: Msvcs-premios
-                uri: lb://Msvcs-premios
+                uri: lb://msvcs-premios
                 predicates:
                   - Path=/api/v1/premios/**,/api/v2/premios/**
               - id: Msvcs-rankings
-                uri: lb://Msvcs-rankings
+                uri: lb://msvcs-rankings
                 predicates:
                   - Path=/api/v1/rankings/**,/api/v2/rankings/**
               - id: Mvsvcs-resultados
-                uri: lb://Msvcs-resultados
+                uri: lb://msvcs-resultados
                 predicates:
                   - Path=/api/v1/resultados/**,/api/v2/resultados/**
               - id: Msvcs-sanciones
-                uri: lb://Msvcs-sanciones
+                uri: lb://msvcs-sanciones
                 predicates:
                   - Path=/api/v1/sanciones/**,/api/v2/sanciones/**
               - id: Msvcs-torneos
-                uri: lb://Msvcs-torneos
+                uri: lb://msvcs-torneos
                 predicates:
                   - Path=/api/v1/torneos/**,/api/v2/torneos/**
               - id: Msvcs-usuarios
-                uri: lb://Msvcs-usuarios
+                uri: lb://msvcs-usuarios
                 predicates:
                   - Path=/api/v1/usuarios/**,/api/v2/usuarios/**
 
@@ -58,67 +58,67 @@ spring:
                 # el /v3/api-docs propio del gateway. RewritePath lo traduce al /v3/api-docs real del servicio.
 
               - id: equipos-api-docs
-                uri: lb://Msvcs-equipos
+                uri: lb://msvcs-equipos
                 predicates:
                   - Path=/api-docs/equipos
                 filters:
                   - RewritePath=/api-docs/equipos, /v3/api-docs
               - id: inscripciones-api-docs
-                uri: lb://Msvcs-inscripciones
+                uri: lb://msvcs-inscripciones
                 predicates:
                   - Path=/api-docs/inscripciones
                 filters:
                   - RewritePath=/api-docs/inscripciones, /v3/api-docs
               - id: juegos-api-docs
-                uri: lb://Msvcs-juegos
+                uri: lb://msvcs-juegos
                 predicates:
                   - Path=/api-docs/juegos
                 filters:
                   - RewritePath=/api-docs/juegos, /v3/api-docs
               - id: notificaciones-api-docs
-                uri: lb://Msvcs-notificaciones
+                uri: lb://msvcs-notificaciones
                 predicates:
                   - Path=/api-docs/notificaciones
                 filters:
                   - RewritePath=/api-docs/notificaciones, /v3/api-docs
               - id: partidas-api-docs
-                uri: lb://Msvcs-partidas
+                uri: lb://msvcs-partidas
                 predicates:
                   - Path=/api-docs/partidas
                 filters:
                   - RewritePath=/api-docs/partidas, /v3/api-docs
               - id: premios-api-docs
-                uri: lb://Msvcs-premios
+                uri: lb://msvcs-premios
                 predicates:
                   - Path=/api-docs/premios
                 filters:
                   - RewritePath=/api-docs/premios, /v3/api-docs
               - id: rankings-api-docs
-                uri: lb://Msvcs-rankings
+                uri: lb://msvcs-rankings
                 predicates:
                   - Path=/api-docs/rankings
                 filters:
                   - RewritePath=/api-docs/rankings, /v3/api-docs
               - id: resultados-api-docs
-                uri: lb://Msvcs-resultados
+                uri: lb://msvcs-resultados
                 predicates:
                   - Path=/api-docs/resultados
                 filters:
                   - RewritePath=/api-docs/resultados, /v3/api-docs
               - id: sanciones-api-docs
-                uri: lb://Msvcs-sanciones
+                uri: lb://msvcs-sanciones
                 predicates:
                   - Path=/api-docs/sanciones
                 filters:
                   - RewritePath=/api-docs/sanciones, /v3/api-docs
               - id: torneos-api-docs
-                uri: lb://Msvcs-torneos
+                uri: lb://msvcs-torneos
                 predicates:
                   - Path=/api-docs/torneos
                 filters:
                   - RewritePath=/api-docs/torneos, /v3/api-docs
               - id: usuarios-api-docs
-                uri: lb://Msvcs-usuarios
+                uri: lb://msvcs-usuarios
                 predicates:
                   - Path=/api-docs/usuarios
                 filters:
