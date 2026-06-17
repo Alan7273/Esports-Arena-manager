@@ -138,4 +138,100 @@ public class NotificacionServiceTest {
         assertThat(result).isEqualTo("Notificación eliminada");
         verify(notificacionRepository, times(1)).delete(notificacionMock);
     }
+
+    @Test
+    @DisplayName("shouldThrowExceptionWhenMarkingReadNonExistingNotification")
+    void shouldThrowExceptionWhenMarkingReadNonExistingNotification() {
+
+        when(notificacionRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(
+                () -> notificacionService.marcarLeida(999L))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Notificación no encontrada");
+    }
+
+    @Test
+    @DisplayName("shouldThrowExceptionWhenDeletingNonExistingNotification")
+    void shouldThrowExceptionWhenDeletingNonExistingNotification() {
+
+        when(notificacionRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(
+                () -> notificacionService.eliminarNotificacion(999L))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Notificación no encontrada");
+    }
+
+    @Test
+    @DisplayName("shouldReturnEmptyListWhenUserHasNoNotifications")
+    void shouldReturnEmptyListWhenUserHasNoNotifications() {
+
+        when(notificacionRepository.findByUsuarioId(100L)).thenReturn(List.of());
+
+        List<NotificacionResponseDTO> result = notificacionService.listarUsuario(100L);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("shouldCreateNotificationWithTeam")
+    void shouldCreateNotificationWithTeam() {
+
+        CrearNotificacionDTO dto = new CrearNotificacionDTO();
+
+        dto.setUsuarioId(100L);
+        dto.setEquipoId(5L);
+        dto.setMensaje("Mensaje");
+        dto.setTipo("INFO");
+
+        when(usuarioClient.existeUsuario(100L)).thenReturn(true);
+
+        when(notificacionRepository.save(any(Notificacion.class))).thenReturn(notificacionMock);
+
+        NotificacionResponseDTO result = notificacionService.crearNotificacion(dto);
+
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    @DisplayName("shouldVerifyUserExistenceBeforeCreate")
+    void shouldVerifyUserExistenceBeforeCreate() {
+
+        CrearNotificacionDTO dto = new CrearNotificacionDTO();
+
+        dto.setUsuarioId(100L);
+        dto.setMensaje("Prueba");
+        dto.setTipo("INFO");
+
+        when(usuarioClient.existeUsuario(100L)).thenReturn(true);
+
+        when(notificacionRepository.save(any(Notificacion.class))).thenReturn(notificacionMock);
+
+        notificacionService.crearNotificacion(dto);
+
+        verify(usuarioClient).existeUsuario(100L);
+    }
+
+    @Test
+    @DisplayName("shouldReturnCorrectNotificationMessage")
+    void shouldReturnCorrectNotificationMessage() {
+
+        when(notificacionRepository.findById(1L)).thenReturn(Optional.of(notificacionMock));
+
+        NotificacionResponseDTO dto = notificacionService.buscarNotificacion(1L);
+
+        assertThat(dto.getMensaje()).isEqualTo("Tu partida comienza en 30 minutos");
+    }
+
+    @Test
+    @DisplayName("shouldInvokeDeleteRepository")
+    void shouldInvokeDeleteRepository() {
+
+        when(notificacionRepository.findById(1L)).thenReturn(Optional.of(notificacionMock));
+
+        notificacionService.eliminarNotificacion(1L);
+
+        verify(notificacionRepository).delete(notificacionMock);
+    }
 }

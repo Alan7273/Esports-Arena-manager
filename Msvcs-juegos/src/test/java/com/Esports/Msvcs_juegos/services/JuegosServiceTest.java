@@ -3,6 +3,7 @@ package com.Esports.Msvcs_juegos.services;
 import com.Esports.Msvcs_juegos.Services.JuegosServiceImpl;
 import com.Esports.Msvcs_juegos.exceptions.ResourceNotFoundException;
 import com.Esports.Msvcs_juegos.models.Juegos;
+import com.Esports.Msvcs_juegos.models.dtos.ActualizarJuegoDTO;
 import com.Esports.Msvcs_juegos.models.dtos.CrearJuegoDTO;
 import com.Esports.Msvcs_juegos.models.dtos.JuegoResponseDTO;
 import com.Esports.Msvcs_juegos.repositories.JuegoRepository;
@@ -115,5 +116,88 @@ public class JuegosServiceTest {
         assertThat(result).isEqualTo("Juego desactivado correctamente");
         assertThat(juegoMock.getEstadojuego()).isEqualTo("INACTIVO");
         verify(juegoRepository, times(1)).save(juegoMock);
+    }
+
+    @Test
+    @DisplayName("shouldUpdateJuegoSuccessfully")
+    void shouldUpdateJuegoSuccessfully() {
+
+        ActualizarJuegoDTO dto = new ActualizarJuegoDTO();
+        dto.setNombrejuegos("Valorant");
+        dto.setGenerojuego("FPS");
+        dto.setModalidadjuegos("5v5");
+        dto.setJugadores_por_equipo(5);
+        dto.setEstadojuego("ACTIVO");
+
+        when(juegoRepository.findById(1L)).thenReturn(Optional.of(juegoMock));
+
+        when(juegoRepository.save(any(Juegos.class))).thenReturn(juegoMock);
+
+        JuegoResponseDTO result = juegosService.actualizarJuego(1L, dto);
+
+        assertThat(result).isNotNull();
+
+        verify(juegoRepository).findById(1L);
+        verify(juegoRepository).save(any(Juegos.class));
+    }
+
+    @Test
+    @DisplayName("shouldThrowExceptionWhenUpdatingNonExistingJuego")
+    void shouldThrowExceptionWhenUpdatingNonExistingJuego() {
+
+        ActualizarJuegoDTO dto = new ActualizarJuegoDTO();
+
+        when(juegoRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(
+                () -> juegosService.actualizarJuego(999L, dto))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Juego no encontrado");
+    }
+
+    @Test
+    @DisplayName("shouldThrowExceptionWhenDeactivatingNonExistingJuego")
+    void shouldThrowExceptionWhenDeactivatingNonExistingJuego() {
+
+        when(juegoRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(
+                () -> juegosService.desactivarJuego(999L))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Juego no encontrado");
+    }
+
+    @Test
+    @DisplayName("shouldReturnEmptyListWhenNoGamesExist")
+    void shouldReturnEmptyListWhenNoGamesExist() {
+
+        when(juegoRepository.findAll()).thenReturn(List.of());
+
+        List<JuegoResponseDTO> result = juegosService.ListarJuegos();
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("shouldAssignActivoStateWhenCreatingGame")
+    void shouldAssignActivoStateWhenCreatingGame() {
+
+        CrearJuegoDTO dto = new CrearJuegoDTO();
+
+        dto.setNombrejuegos("CS2");
+        dto.setGenerojuego("FPS");
+        dto.setModalidadjuegos("5v5");
+        dto.setJugadores_por_equipo(5);
+
+        Juegos juego = new Juegos();
+
+        juego.setJuegosId(10L);
+        juego.setEstadojuego("ACTIVO");
+
+        when(juegoRepository.save(any(Juegos.class))).thenReturn(juego);
+
+        JuegoResponseDTO result = juegosService.CrearJuego(dto);
+
+        assertThat(result.getEstadojuego()).isEqualTo("ACTIVO");
     }
 }
