@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
         name = "msvcs-usuarios",
-        url = "${msvcs.usuarios.url}",
         configuration = FeignConfig.class,
         fallback = UsuarioClientFallback.class)
 public interface UsuarioClient {

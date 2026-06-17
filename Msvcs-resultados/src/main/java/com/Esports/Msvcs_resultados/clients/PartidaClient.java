@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(
         name = "msvcs-partidas",
-        url = "${msvcs.partidas.url}",
         configuration = FeignConfig.class,
         fallback = PartidaClientFallback.class)
 public interface PartidaClient {
