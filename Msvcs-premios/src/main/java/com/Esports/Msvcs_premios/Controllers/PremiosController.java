@@ -32,8 +32,17 @@ public class PremiosController {
 
     @Operation(summary = "Crear un premio")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Premio creado exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos")
+            @ApiResponse(responseCode = "201", description = "Premio creado exitosamente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PremioResponseDTO.class),
+                            examples = @ExampleObject(value = """
+                {"premioId":6,"torneoId":2,"posicion":1,"descripcion":"Trofeo + $500.000 CLP","valor":500000.0,"estado":"PENDIENTE"}
+                """))),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":400,"error":"Bad Request","message":"El valor debe ser mayor a 0"}
+                """)))
     })
     @PostMapping
     public ResponseEntity<PremioResponseDTO> crearPremio(@Valid @RequestBody CrearPremioDTO dto) {
@@ -52,7 +61,7 @@ public class PremiosController {
             @ApiResponse(responseCode = "404", description = "Premio no encontrado")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<PremioResponseDTO> buscarPremio(@PathVariable Long id) {
+    public ResponseEntity<PremioResponseDTO> buscarPremio(@Parameter(description = "ID del premio", example = "6") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(premioService.buscarPremio(id));
     }
 
@@ -62,17 +71,24 @@ public class PremiosController {
             @ApiResponse(responseCode = "404", description = "Premio no encontrado")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<PremioResponseDTO> actualizarPremio(@PathVariable Long id, @Valid @RequestBody ActualizarPremioDTO dto) {
+    public ResponseEntity<PremioResponseDTO> actualizarPremio(@Parameter(description = "ID del premio", example = "6") @PathVariable Long id, @Valid @RequestBody ActualizarPremioDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(premioService.actualizarPremio(id, dto));
     }
 
     @Operation(summary = "Asignar un premio a un participante")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Premio asignado"),
-            @ApiResponse(responseCode = "404", description = "Premio no encontrado")
+            @ApiResponse(responseCode = "200", description = "Premio asignado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "\"Premio asignado correctamente al participante 10\""))),
+            @ApiResponse(responseCode = "404", description = "Premio no encontrado",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":404,"error":"Not Found","message":"Premio con id 99 no encontrado"}
+                """)))
     })
     @PutMapping("/asignar/{id}")
-    public ResponseEntity<String> asignarPremio(@PathVariable Long id, @RequestParam Long participanteId) {
+    public ResponseEntity<String> asignarPremio(@Parameter(description = "ID del premio a asignar", example = "6") @PathVariable Long id,
+                                                @Parameter(description = "ID del participante ganador", example = "10") @RequestParam Long participanteId) {
         return ResponseEntity.status(HttpStatus.OK).body(premioService.asignarPremio(id, participanteId));
     }
 }

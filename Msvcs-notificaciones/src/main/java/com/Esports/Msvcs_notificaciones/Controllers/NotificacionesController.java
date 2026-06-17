@@ -13,6 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
@@ -27,8 +31,17 @@ public class NotificacionesController {
 
     @Operation(summary = "Crear una notificación")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Notificación creada exitosamente"),
-            @ApiResponse(responseCode = "404", description = "Usuario destinatario no existe")
+            @ApiResponse(responseCode = "201", description = "Notificación creada exitosamente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = NotificacionResponseDTO.class),
+                            examples = @ExampleObject(value = """
+                {"notificacionId":30,"usuarioId":7,"equipoId":10,"tipo":"EQUIPO","mensaje":"Has sido agregado al equipo Team Phantom","leidaNotificacion":false,"fecha":"2025-06-10"}
+                """))),
+            @ApiResponse(responseCode = "404", description = "Usuario destinatario no existe",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":404,"error":"Not Found","message":"Usuario con id 99 no encontrado"}
+                """)))
     })
     @PostMapping
     public ResponseEntity<NotificacionResponseDTO> crearNotificacion(@Valid @RequestBody CrearNotificacionDTO dto) {
@@ -37,7 +50,7 @@ public class NotificacionesController {
 
     @Operation(summary = "Listar notificaciones de un usuario")
     @GetMapping("/usuario/{id}")
-    public ResponseEntity<List<NotificacionResponseDTO>> listarUsuario(@PathVariable Long id) {
+    public ResponseEntity<List<NotificacionResponseDTO>> listarUsuario(@Parameter(description = "ID del usuario", example = "7") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(notificacionService.listarUsuario(id));
     }
 
@@ -47,27 +60,39 @@ public class NotificacionesController {
             @ApiResponse(responseCode = "404", description = "Notificación no encontrada")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<NotificacionResponseDTO> buscarNotificacion(@PathVariable Long id) {
+    public ResponseEntity<NotificacionResponseDTO> buscarNotificacion(@Parameter(description = "ID de la notificación", example = "30") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(notificacionService.buscarNotificacion(id));
     }
 
     @Operation(summary = "Marcar una notificación como leída")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Notificación marcada como leída"),
-            @ApiResponse(responseCode = "404", description = "Notificación no encontrada")
+            @ApiResponse(responseCode = "200", description = "Notificación marcada como leída",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "\"Notificación marcada como leída\""))),
+            @ApiResponse(responseCode = "404", description = "Notificación no encontrada",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":404,"error":"Not Found","message":"Notificación con id 99 no encontrada"}
+                """)))
     })
     @PutMapping("/leida/{id}")
-    public ResponseEntity<String> marcarLeida(@PathVariable Long id) {
+    public ResponseEntity<String> marcarLeida(@Parameter(description = "ID de la notificación", example = "30") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(notificacionService.marcarLeida(id));
     }
 
     @Operation(summary = "Eliminar una notificación")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Notificación eliminada"),
-            @ApiResponse(responseCode = "404", description = "Notificación no encontrada")
+            @ApiResponse(responseCode = "200", description = "Notificación eliminada",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = "\"Notificación eliminada correctamente\""))),
+            @ApiResponse(responseCode = "404", description = "Notificación no encontrada",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                {"status":404,"error":"Not Found","message":"Notificación con id 99 no encontrada"}
+                """)))
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarNotificacion(@PathVariable Long id) {
+    public ResponseEntity<String> eliminarNotificacion(@Parameter(description = "ID de la notificación a eliminar", example = "30") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(notificacionService.eliminarNotificacion(id));
     }
 }
