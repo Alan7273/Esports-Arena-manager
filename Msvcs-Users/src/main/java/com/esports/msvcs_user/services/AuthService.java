@@ -4,9 +4,9 @@ import com.esports.msvcs_user.dtos.AuthResponse;
 import com.esports.msvcs_user.dtos.LoginRequest;
 import com.esports.msvcs_user.dtos.RegisterRequest;
 import com.esports.msvcs_user.models.Rol;
-import com.esports.msvcs_user.models.Usuario;
+import com.esports.msvcs_user.models.User;
 import com.esports.msvcs_user.repositories.RolRepository;
-import com.esports.msvcs_user.repositories.UsuarioRepository;
+import com.esports.msvcs_user.repositories.UserRepository;
 import com.esports.msvcs_user.security.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,12 +24,12 @@ import java.util.stream.Collectors;
 public class AuthService {
 
     // Dependencias inyectadas por el constructor (la forma recomendada en Spring):
-    private final UsuarioRepository usuarioRepository; // acceso a la tabla de usuarios
+    private final UserRepository usuarioRepository; // acceso a la tabla de usuarios
     private final RolRepository rolRepository;         // acceso a la tabla de roles
     private final PasswordEncoder passwordEncoder;     // cifra y compara contrasenas (BCrypt)
     private final JwtService jwtService;               // genera el token firmado
 
-    public AuthService(UsuarioRepository usuarioRepository, RolRepository rolRepository,
+    public AuthService(UserRepository usuarioRepository, RolRepository rolRepository,
                        PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.usuarioRepository = usuarioRepository;
         this.rolRepository = rolRepository;
@@ -57,7 +57,7 @@ public class AuthService {
                 .collect(Collectors.toCollection(HashSet::new));
 
         // 4) Armar el usuario. La contrasena se guarda CIFRADA con BCrypt, nunca en texto plano.
-        Usuario usuario = new Usuario();
+        User usuario = new User();
         usuario.setUsername(request.getUsername());
         usuario.setPassword(this.passwordEncoder.encode(request.getPassword()));
         usuario.setRoles(roles);
@@ -72,7 +72,7 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
         // Buscar el usuario. Si no existe, se responde el MISMO error que clave mala,
         // para no revelar si el problema fue el usuario o la contrasena.
-        Usuario usuario = this.usuarioRepository.findByUsername(request.getUsername())
+        User usuario = this.usuarioRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciales invalidas"));
 
         // Comparar la clave enviada contra el hash BCrypt guardado. matches() vuelve a cifrar y compara.
@@ -84,7 +84,7 @@ public class AuthService {
     }
 
     // Genera el token y arma la respuesta (token + datos basicos del usuario, sin la contrasena).
-    private AuthResponse construirRespuesta(Usuario usuario) {
+    private AuthResponse construirRespuesta(User usuario) {
         String token = this.jwtService.generarToken(usuario);
         Set<String> roles = usuario.getRoles().stream().map(Rol::getNombre).collect(Collectors.toSet());
         return new AuthResponse(token, "Bearer", usuario.getUsername(), roles);

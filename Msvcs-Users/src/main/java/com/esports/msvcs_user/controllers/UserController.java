@@ -1,8 +1,8 @@
 package com.esports.msvcs_user.controllers;
 
-import com.esports.msvcs_user.dtos.UsuarioDTO;
+import com.esports.msvcs_user.dtos.UserDTO;
 import com.esports.msvcs_user.models.Rol;
-import com.esports.msvcs_user.repositories.UsuarioRepository;
+import com.esports.msvcs_user.repositories.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/usuarios")
 @Tag(name = "Usuarios", description = "Gestion de usuarios (requiere token)")
 @SecurityRequirement(name = "bearer-jwt")
-public class UsuarioController {
+public class UserController {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UserRepository usuarioRepository;
 
-    public UsuarioController(UsuarioRepository usuarioRepository) {
+    public UserController(UserRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
 
@@ -32,9 +32,9 @@ public class UsuarioController {
     @Operation(summary = "Listar usuarios", description = "Solo ADMIN. Devuelve usuarios sin la contrasena.")
     // @PreAuthorize evalua la expresion ANTES de ejecutar el metodo. hasRole('ADMIN') exige el authority ROLE_ADMIN.
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UsuarioDTO>> findAll() {
-        List<UsuarioDTO> usuarios = this.usuarioRepository.findAll().stream()
-                .map(u -> new UsuarioDTO(
+    public ResponseEntity<List<UserDTO>> findAll() {
+        List<UserDTO> usuarios = this.usuarioRepository.findAll().stream()
+                .map(u -> new UserDTO(
                         u.getUsuarioId(),
                         u.getUsername(),
                         u.getRoles().stream().map(Rol::getNombre).collect(Collectors.toSet())))

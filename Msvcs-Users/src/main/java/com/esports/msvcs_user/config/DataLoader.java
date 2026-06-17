@@ -1,9 +1,9 @@
 package com.esports.msvcs_user.config;
 
 import com.esports.msvcs_user.models.Rol;
-import com.esports.msvcs_user.models.Usuario;
+import com.esports.msvcs_user.models.User;
 import com.esports.msvcs_user.repositories.RolRepository;
-import com.esports.msvcs_user.repositories.UsuarioRepository;
+import com.esports.msvcs_user.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -16,10 +16,10 @@ import java.util.Set;
 public class DataLoader implements CommandLineRunner {
 
     private final RolRepository rolRepository;
-    private final UsuarioRepository usuarioRepository;
+    private final UserRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DataLoader(RolRepository rolRepository, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public DataLoader(RolRepository rolRepository, UserRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.rolRepository = rolRepository;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
@@ -44,7 +44,7 @@ public class DataLoader implements CommandLineRunner {
         if (this.usuarioRepository.existsByUsername(username)) {
             return;
         }
-        Usuario usuario = new Usuario();
+        User usuario = new User();
         usuario.setUsername(username);
         usuario.setPassword(this.passwordEncoder.encode(passwordPlano));
         usuario.setRoles(roles);

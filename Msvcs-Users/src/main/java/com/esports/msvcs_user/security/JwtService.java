@@ -1,7 +1,7 @@
 package com.esports.msvcs_user.security;
 
 import com.esports.msvcs_user.models.Rol;
-import com.esports.msvcs_user.models.Usuario;
+import com.esports.msvcs_user.models.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
@@ -25,7 +25,7 @@ public class JwtService {
         this.jwtEncoder = jwtEncoder;
     }
 
-    public String generarToken(Usuario usuario) {
+    public String generarToken(User usuario) {
         Instant ahora = Instant.now();
         // Los roles se firman dentro del token como una lista de strings (ROLE_X).
         List<String> roles = usuario.getRoles().stream().map(Rol::getNombre).toList();
