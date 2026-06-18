@@ -27,13 +27,13 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        Rol admin = obtenerOCrearRol("ROLE_ADMIN");
-        Rol medico = obtenerOCrearRol("ROLE_MEDICO");
-        Rol paciente = obtenerOCrearRol("ROLE_PACIENTE");
+        Rol admin   = obtenerOCrearRol("ROLE_ADMIN");
+        Rol jugador = obtenerOCrearRol("ROLE_JUGADOR");
+        Rol arbitro = obtenerOCrearRol("ROLE_ARBITRO");
 
-        crearUsuarioSiNoExiste("admin", "admin123", Set.of(admin));
-        crearUsuarioSiNoExiste("medico1", "medico123", Set.of(medico));
-        crearUsuarioSiNoExiste("paciente1", "paciente123", Set.of(paciente));
+        crearUsuarioSiNoExiste("admin",    "admin123",    Set.of(admin));
+        crearUsuarioSiNoExiste("jugador1", "jugador123",  Set.of(jugador));
+        crearUsuarioSiNoExiste("arbitro1", "arbitro123",  Set.of(arbitro));
     }
 
     private Rol obtenerOCrearRol(String nombre) {
