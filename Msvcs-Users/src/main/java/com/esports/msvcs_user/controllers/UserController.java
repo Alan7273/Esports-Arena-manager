@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 // Endpoint PROTEGIDO: solo un ADMIN puede listar los usuarios. Demuestra el control por rol.
 @RestController
-@RequestMapping("/api/v1/usuarios")
+@RequestMapping("/api/v1/user")
 @Tag(name = "Usuarios", description = "Gestion de usuarios (requiere token)")
 @SecurityRequirement(name = "bearer-jwt")
 public class UserController {
