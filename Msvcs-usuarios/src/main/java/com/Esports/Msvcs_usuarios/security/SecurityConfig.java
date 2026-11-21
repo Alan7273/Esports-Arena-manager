@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -26,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 // (leer vs escribir, etc.) la aplica cada microservicio. Asi cada uno queda protegido por si mismo.
 // El gateway reenvia la cabecera "Authorization" al servicio destino, asi que el token llega completo.
 @Configuration
+@EnableMethodSecurity 
 public class SecurityConfig {
 
     // Misma clave secreta que uso msvc-usuarios para firmar: por eso el gateway puede validar la firma.

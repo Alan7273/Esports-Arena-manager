@@ -3,6 +3,7 @@ package com.Esports.Msvcs_gateway.security;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -11,10 +12,15 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 // Seguridad del GATEWAY: la PRIMERA barrera.
 //
@@ -26,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 // (leer vs escribir, etc.) la aplica cada microservicio. Asi cada uno queda protegido por si mismo.
 // El gateway reenvia la cabecera "Authorization" al servicio destino, asi que el token llega completo.
 @Configuration
+@EnableMethodSecurity 
 public class SecurityConfig {
 
     // Misma clave secreta que uso msvc-usuarios para firmar: por eso el gateway puede validar la firma.
@@ -52,11 +59,24 @@ public class SecurityConfig {
     }
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration cfg = new CorsConfiguration();
+        cfg.setAllowedOrigins(List.of("http://localhost:5173"));
+        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        cfg.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", cfg);
+        return source;
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationConverter converter) throws Exception {
         http
                 // API sin estado: el token viaja en cada request, no hay formularios con sesion. CSRF off.
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Login y registro DEBEN ser publicos: el usuario aun no tiene token cuando los llama.
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         // Swagger agregado del gateway y los docs de cada servicio: abiertos para la demo.
