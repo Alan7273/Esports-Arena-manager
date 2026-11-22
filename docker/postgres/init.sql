@@ -1,0 +1,12 @@
+CREATE DATABASE users;
+CREATE DATABASE equipos;
+CREATE DATABASE inscripciones;
+CREATE DATABASE juegos;
+CREATE DATABASE notificaciones;
+CREATE DATABASE partidas;
+CREATE DATABASE premios;
+CREATE DATABASE rankings;
+CREATE DATABASE resultados;
+CREATE DATABASE sanciones;
+CREATE DATABASE torneos;
+CREATE DATABASE usuarios;
