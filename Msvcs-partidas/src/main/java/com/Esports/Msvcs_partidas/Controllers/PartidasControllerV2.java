@@ -14,6 +14,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +37,7 @@ public class PartidasControllerV2 {
     private PartidaModelAssembler assembler;
 
     @Operation(summary = "Crear una partida (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<PartidaResponseDTO>> crearPartida(@Valid @RequestBody CrearPartidaDTO dto) {
         PartidaResponseDTO nueva = partidaService.crearPartida(dto);
@@ -62,12 +64,14 @@ public class PartidasControllerV2 {
     }
 
     @Operation(summary = "Actualizar el horario de una partida (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/horario/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<PartidaResponseDTO>> actualizarHorario(@PathVariable Long id, @RequestParam LocalDateTime fechaHora) {
         return ResponseEntity.ok(assembler.toModel(partidaService.actualizarHorario(id, fechaHora)));
     }
 
     @Operation(summary = "Cancelar una partida (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(value = "/cancelar/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<?> cancelarPartida(@PathVariable Long id) {
         partidaService.cancelarPartida(id);

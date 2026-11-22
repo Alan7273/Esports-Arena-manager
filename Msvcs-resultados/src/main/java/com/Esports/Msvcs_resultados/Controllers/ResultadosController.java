@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class ResultadosController {
                 {"status":400,"error":"Bad Request","message":"Ya existe un resultado para esta partida"}
                 """)))
     })
+    @PreAuthorize("hasAnyRole('ARBITRO','ADMIN')")
     @PostMapping
     public ResponseEntity<ResultadoResponseDTO> registrarResultado(@Valid @RequestBody CrearResultadoDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(resultadoService.registrarResultado(dto));
@@ -70,6 +72,7 @@ public class ResultadosController {
             @ApiResponse(responseCode = "200", description = "Resultado actualizado"),
             @ApiResponse(responseCode = "404", description = "Resultado no encontrado")
     })
+    @PreAuthorize("hasAnyRole('ARBITRO','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ResultadoResponseDTO> actualizarResultado(@Parameter(description = "ID del resultado", example = "8") @PathVariable Long id, @Valid @RequestBody ActualizarResultadoDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(resultadoService.actualizarResultado(id, dto));
@@ -86,6 +89,7 @@ public class ResultadosController {
                 {"status":404,"error":"Not Found","message":"Resultado con id 99 no encontrado"}
                 """)))
     })
+    @PreAuthorize("hasAnyRole('ARBITRO','ADMIN')")
     @PutMapping("/validar/{id}")
     public ResponseEntity<String> validarResultado(@Parameter(description = "ID del resultado a validar", example = "8") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(resultadoService.validarResultado(id));
@@ -102,6 +106,7 @@ public class ResultadosController {
                 {"status":404,"error":"Not Found","message":"Resultado con id 99 no encontrado"}
                 """)))
     })
+    @PreAuthorize("hasAnyRole('ARBITRO','ADMIN')")
     @DeleteMapping("/anular/{id}")
     public ResponseEntity<String> anularResultado(@Parameter(description = "ID del resultado a anular", example = "8") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(resultadoService.anularResultado(id));

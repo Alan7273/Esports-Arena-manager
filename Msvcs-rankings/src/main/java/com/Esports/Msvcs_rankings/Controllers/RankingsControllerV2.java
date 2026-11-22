@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ public class RankingsControllerV2 {
     private RankingModelAssembler assembler;
 
     @Operation(summary = "Crear el registro de ranking de un participante en un torneo")
+    @PreAuthorize("hasAnyRole('ARBITRO','ADMIN')")
     @PutMapping("/torneo/{torneoId}/participante/{participanteId}")
     public ResponseEntity<String> crearRanking(@PathVariable Long torneoId, @PathVariable Long participanteId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(rankingService.crearRankingParticipante(torneoId, participanteId));
@@ -56,12 +58,14 @@ public class RankingsControllerV2 {
     }
 
     @Operation(summary = "Recalcular las posiciones del ranking de un torneo")
+    @PreAuthorize("hasAnyRole('ARBITRO','ADMIN')")
     @PutMapping("/recalcular/{torneoId}")
     public ResponseEntity<String> actualizarRanking(@PathVariable Long torneoId) {
         return ResponseEntity.status(HttpStatus.OK).body(rankingService.actualizarRanking(torneoId));
     }
 
     @Operation(summary = "Reiniciar el ranking de un torneo")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/reiniciar/{torneoId}")
     public ResponseEntity<String> reiniciarRanking(@PathVariable Long torneoId) {
         return ResponseEntity.status(HttpStatus.OK).body(rankingService.reiniciarRanking(torneoId));

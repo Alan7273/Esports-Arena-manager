@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +37,7 @@ public class SancionesControllerV2 {
     private SancionModelAssembler assembler;
 
     @Operation(summary = "Crear una sanción (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<SancionResponseDTO>> crearSancion(@Valid @RequestBody CrearSancionDTO dto) {
         SancionResponseDTO nueva = sancionesService.crearSancion(dto);
@@ -62,6 +64,7 @@ public class SancionesControllerV2 {
     }
 
     @Operation(summary = "Cerrar una sanción (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(value = "/cerrar/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<?> cerrarSancion(@PathVariable Long id) {
         sancionesService.cerrarSancion(id);
@@ -75,6 +78,7 @@ public class SancionesControllerV2 {
     }
 
     @Operation(summary = "Actualizar una sanción (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<SancionResponseDTO>> actualizarSancion(@PathVariable Long id, @Valid @RequestBody ActualizarSancionDTO dto) {
         return ResponseEntity.ok(assembler.toModel(sancionesService.actualizarSancion(id, dto)));

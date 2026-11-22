@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class TorneosController {
                 {"status":400,"error":"Bad Request","message":"La fecha de fin debe ser posterior a la fecha de inicio"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<TorneoResponseDTO> crearTorneo(@Valid @RequestBody CrearTorneoDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(torneoService.crearTorneo(dto));
@@ -80,6 +82,7 @@ public class TorneosController {
             @ApiResponse(responseCode = "400", description = "Torneo cerrado/cancelado o fechas inválidas"),
             @ApiResponse(responseCode = "404", description = "Torneo no encontrado")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<TorneoResponseDTO> actualizarTorneo(@Parameter(description = "ID del torneo", example = "2") @Valid @PathVariable Long id,@RequestBody ActualizarTorneoDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(torneoService.actualizarTorneo(id, dto));
@@ -90,6 +93,7 @@ public class TorneosController {
             @ApiResponse(responseCode = "200", description = "Torneo cerrado"),
             @ApiResponse(responseCode = "404", description = "Torneo no encontrado")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/cerrar/{id}")
     public ResponseEntity<String> cerrarTorneo(@Parameter(description = "ID del torneo a cerrar", example = "2") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(torneoService.cerrarTorneo(id));
@@ -100,6 +104,7 @@ public class TorneosController {
             @ApiResponse(responseCode = "200", description = "Torneo cancelado"),
             @ApiResponse(responseCode = "404", description = "Torneo no encontrado")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/cancelar/{id}")
     public ResponseEntity<String> cancelarTorneo(@Parameter(description = "ID del torneo a cancelar", example = "2") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(torneoService.cancelarTorneo(id));

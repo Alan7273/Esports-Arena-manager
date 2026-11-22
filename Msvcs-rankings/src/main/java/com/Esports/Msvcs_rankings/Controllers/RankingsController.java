@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class RankingsController {
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = "\"Ranking creado correctamente para el participante 10 en el torneo 2\"")))
     })
+    @PreAuthorize("hasAnyRole('ARBITRO','ADMIN')")
     @PutMapping("/torneo/{torneoId}/participante/{participanteId}")
     public ResponseEntity<String> crearRanking(@Parameter(description = "ID del torneo", example = "2") @PathVariable Long torneoId,
                                                @Parameter(description = "ID del participante", example = "10") @PathVariable Long participanteId) {
@@ -66,6 +68,7 @@ public class RankingsController {
                 {"status":404,"error":"Not Found","message":"No se encontraron rankings para el torneo 99"}
                 """)))
     })
+    @PreAuthorize("hasAnyRole('ARBITRO','ADMIN')")
     @PutMapping("/recalcular/{torneoId}")
     public ResponseEntity<String> actualizarRanking(@Parameter(description = "ID del torneo", example = "2") @PathVariable Long torneoId) {
         return ResponseEntity.status(HttpStatus.OK).body(rankingService.actualizarRanking(torneoId));
@@ -76,6 +79,7 @@ public class RankingsController {
             @ApiResponse(responseCode = "200", description = "Ranking reiniciado"),
             @ApiResponse(responseCode = "404", description = "No hay rankings para el torneo")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/reiniciar/{torneoId}")
     public ResponseEntity<String> reiniciarRanking(@Parameter(description = "ID del torneo a reiniciar", example = "2") @PathVariable Long torneoId) {
         return ResponseEntity.status(HttpStatus.OK).body(rankingService.reiniciarRanking(torneoId));

@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ public class NotificacionesControllerV2 {
     private NotificacionModelAssembler assembler;
 
     @Operation(summary = "Crear una notificación (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<NotificacionResponseDTO>> crearNotificacion(@Valid @RequestBody CrearNotificacionDTO dto) {
         NotificacionResponseDTO nueva = notificacionService.crearNotificacion(dto);
@@ -67,6 +69,7 @@ public class NotificacionesControllerV2 {
     }
 
     @Operation(summary = "Eliminar una notificación (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<?> eliminarNotificacion(@PathVariable Long id) {
         notificacionService.eliminarNotificacion(id);

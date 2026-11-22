@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +40,7 @@ public class InscripcionControllerV2 {
     private InscripcionModelAssembler assembler;
 
     @Operation(summary = "Crear una inscripción (HATEOAS)")
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<InscripcionResponseDTO>> crearInscripcion(@Valid @RequestBody CrearInscripcionDTO dto) {
         InscripcionResponseDTO nueva = inscripcionesService.crearInscripcion(dto);
@@ -65,12 +67,14 @@ public class InscripcionControllerV2 {
     }
 
     @Operation(summary = "Actualizar el estado de una inscripción (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/estado/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<InscripcionResponseDTO>> actualizarEstado(@PathVariable Long id, @RequestParam String estado) {
         return ResponseEntity.ok(assembler.toModel(inscripcionesService.actualizarEstado(id, estado)));
     }
 
     @Operation(summary = "Cancelar una inscripción (HATEOAS)")
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @DeleteMapping(value = "/cancelar/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<?> cancelarInscripcion(@PathVariable Long id) {
         inscripcionesService.cancelarInscripcion(id);

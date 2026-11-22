@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class UsuariosController {
                 {"status":400,"error":"Bad Request","message":"El correo debe tener un formato valido"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<UsuarioResponseDTO> crearUsuario(@Valid @RequestBody CrearUsuarioDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.crearUsuario(dto));
@@ -70,6 +72,7 @@ public class UsuariosController {
             @ApiResponse(responseCode = "200", description = "Usuario actualizado"),
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> actualizarUsuario(@Parameter(description = "ID del usuario a actualizar", example = "7") @PathVariable Long id, @Valid @RequestBody ActualizarUsuarioDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(usuarioService.actualizarUsuario(id, dto));
@@ -86,6 +89,7 @@ public class UsuariosController {
                 {"status":404,"error":"Not Found","message":"Usuario con id 99 no encontrado"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> desactivarUsuario(@Parameter(description = "ID del usuario a desactivar", example = "7") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(usuarioService.DesactivarUsuario(id));

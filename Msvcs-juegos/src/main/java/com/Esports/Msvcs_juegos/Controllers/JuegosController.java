@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class JuegosController {
                 {"status":400,"error":"Bad Request","message":"El nombre del juego no puede estar vacio"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<JuegoResponseDTO> crearJuego(@Valid @RequestBody CrearJuegoDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(juegosService.CrearJuego(dto));
@@ -88,6 +90,7 @@ public class JuegosController {
                 {"status":404,"error":"Not Found","message":"Juego con id 99 no encontrado"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<JuegoResponseDTO> actualizarJuego(@Parameter(description = "ID del juego a actualizar", example = "1") @PathVariable Long id, @Valid @RequestBody ActualizarJuegoDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(juegosService.actualizarJuego(id, dto));
@@ -104,6 +107,7 @@ public class JuegosController {
                 {"status":404,"error":"Not Found","message":"Juego con id 99 no encontrado"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/desactivar/{id}")
     public ResponseEntity<String> desactivarJuego(@Parameter(description = "ID del juego a desactivar", example = "1") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(juegosService.desactivarJuego(id));

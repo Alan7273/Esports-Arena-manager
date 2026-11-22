@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ public class EquiposControllerV2 {
     private EquipoModelAssembler assembler;
 
     @Operation(summary = "Crear un equipo (HATEOAS)")
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<EquipoResponseDTO>> crearEquipo(@Valid @RequestBody CrearEquipoDTO dto) {
         EquipoResponseDTO nuevo = equipoService.crearEquipo(dto);
@@ -46,6 +48,7 @@ public class EquiposControllerV2 {
     }
 
     @Operation(summary = "Listar equipos (HATEOAS)")
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public CollectionModel<EntityModel<EquipoResponseDTO>> listarEquipos() {
         List<EntityModel<EquipoResponseDTO>> equipos = equipoService.listarEquipos().stream()
@@ -57,18 +60,21 @@ public class EquiposControllerV2 {
     }
 
     @Operation(summary = "Buscar equipo por ID (HATEOAS)")
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public EntityModel<EquipoResponseDTO> buscarEquipo(@PathVariable Long id) {
         return assembler.toModel(equipoService.buscarEquipo(id));
     }
 
     @Operation(summary = "Agregar miembro a un equipo")
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @PostMapping("/{id}/miembros")
     public ResponseEntity<MiembroEquipoResponseDTO> agregarMiembro(@PathVariable Long id, @Valid @RequestBody AgregarMiembroDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(equipoService.agregarMiembro(id, dto));
     }
 
     @Operation(summary = "Eliminar un miembro de un equipo")
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @DeleteMapping("/{equipoId}/miembros/{usuarioId}")
     public ResponseEntity<Void> eliminarMiembro(@PathVariable Long equipoId, @PathVariable Long usuarioId) {
         equipoService.eliminarMiembro(equipoId, usuarioId);
@@ -76,12 +82,14 @@ public class EquiposControllerV2 {
     }
 
     @Operation(summary = "Actualizar el capitán de un equipo (HATEOAS)")
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @PutMapping(value = "/capitan/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<EquipoResponseDTO>> actualizarCapitan(@PathVariable Long id, @RequestParam Long capitanId) {
         return ResponseEntity.ok(assembler.toModel(equipoService.actualizarCapitan(id, capitanId)));
     }
 
     @Operation(summary = "Desactivar un equipo (HATEOAS)")
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @DeleteMapping(value = "/desactivar/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<?> desactivarEquipo(@PathVariable Long id) {
         equipoService.desactivarEquipo(id);

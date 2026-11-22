@@ -15,6 +15,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ public class TorneosControllerV2 {
     private TorneoModelAssembler assembler;
 
     @Operation(summary = "Crear un torneo (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<TorneoResponseDTO>> crearTorneo(@Valid @RequestBody CrearTorneoDTO dto) {
         TorneoResponseDTO nuevo = torneoService.crearTorneo(dto);
@@ -61,12 +63,14 @@ public class TorneosControllerV2 {
     }
 
     @Operation(summary = "Actualizar un torneo (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<TorneoResponseDTO>> actualizarTorneo(@Valid @PathVariable Long id, @RequestBody ActualizarTorneoDTO dto) {
         return ResponseEntity.ok(assembler.toModel(torneoService.actualizarTorneo(id, dto)));
     }
 
     @Operation(summary = "Cerrar un torneo (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(value = "/cerrar/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<String> cerrarTorneo(@PathVariable Long id) {
         torneoService.cerrarTorneo(id);
@@ -74,6 +78,7 @@ public class TorneosControllerV2 {
     }
 
     @Operation(summary = "Cancelar un torneo (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(value = "/cancelar/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<String> cancelarTorneo(@PathVariable Long id) {
         torneoService.cancelarTorneo(id);

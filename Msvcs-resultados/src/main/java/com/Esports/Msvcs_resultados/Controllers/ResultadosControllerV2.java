@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +37,7 @@ public class ResultadosControllerV2 {
     private ResultadoModelAssembler assembler;
 
     @Operation(summary = "Registrar el resultado de una partida (HATEOAS)")
+    @PreAuthorize("hasAnyRole('ARBITRO','ADMIN')")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<ResultadoResponseDTO>> registrarResultado(@Valid @RequestBody CrearResultadoDTO dto) {
         ResultadoResponseDTO nuevo = resultadoService.registrarResultado(dto);
@@ -62,18 +64,21 @@ public class ResultadosControllerV2 {
     }
 
     @Operation(summary = "Actualizar un resultado (HATEOAS)")
+    @PreAuthorize("hasAnyRole('ARBITRO','ADMIN')")
     @PutMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<ResultadoResponseDTO>> actualizarResultado(@PathVariable Long id, @Valid @RequestBody ActualizarResultadoDTO dto) {
         return ResponseEntity.ok(assembler.toModel(resultadoService.actualizarResultado(id, dto)));
     }
 
     @Operation(summary = "Validar un resultado")
+    @PreAuthorize("hasAnyRole('ARBITRO','ADMIN')")
     @PutMapping("/validar/{id}")
     public ResponseEntity<String> validarResultado(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(resultadoService.validarResultado(id));
     }
 
     @Operation(summary = "Anular un resultado (HATEOAS)")
+    @PreAuthorize("hasAnyRole('ARBITRO','ADMIN')")
     @DeleteMapping(value = "/anular/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<?> anularResultado(@PathVariable Long id) {
         resultadoService.anularResultado(id);

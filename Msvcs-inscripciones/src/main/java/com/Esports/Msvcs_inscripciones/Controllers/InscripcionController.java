@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -57,6 +58,7 @@ public class InscripcionController {
                 {"status":409,"error":"Conflict","message":"El equipo ya está inscrito en este torneo"}
                 """)))
     })
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @PostMapping
     public ResponseEntity<InscripcionResponseDTO> crearInscripcion(@Valid @RequestBody CrearInscripcionDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(inscripcionesService.crearInscripcion(dto));
@@ -83,6 +85,7 @@ public class InscripcionController {
             @ApiResponse(responseCode = "200", description = "Estado actualizado"),
             @ApiResponse(responseCode = "404", description = "Inscripción no encontrada")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/estado/{id}")
     public ResponseEntity<InscripcionResponseDTO> actualizarEstado(@Parameter(description = "ID de la inscripción", example = "15") @PathVariable Long id,
                                                                    @Parameter(description = "Nuevo estado", example = "ACEPTADO") @RequestParam String estado) {
@@ -100,6 +103,7 @@ public class InscripcionController {
                 {"status":404,"error":"Not Found","message":"Inscripción con id 99 no encontrada"}
                 """)))
     })
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @DeleteMapping("/cancelar/{id}")
     public ResponseEntity<String> cancelarInscripcion(@Parameter(description = "ID de la inscripción a cancelar", example = "15") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(inscripcionesService.cancelarInscripcion(id));

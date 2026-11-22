@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -45,12 +46,14 @@ public class EquiposController {
                 {"status":404,"error":"Not Found","message":"Capitán con id 99 no encontrado"}
                 """)))
     })
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @PostMapping
     public ResponseEntity<EquipoResponseDTO> crearEquipo(@Valid @RequestBody CrearEquipoDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(equipoService.crearEquipo(dto));
     }
 
     @Operation(summary = "Listar equipos")
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @GetMapping
     public ResponseEntity<List<EquipoResponseDTO>> listarEquipos() {
         return ResponseEntity.status(HttpStatus.OK).body(equipoService.listarEquipos());
@@ -70,6 +73,7 @@ public class EquiposController {
                 {"status":404,"error":"Not Found","message":"Equipo con id 99 no encontrado"}
                 """)))
     })
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<EquipoResponseDTO> buscarEquipo(@Parameter(description = "ID del equipo a buscar", example = "10") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(equipoService.buscarEquipo(id));
@@ -89,6 +93,7 @@ public class EquiposController {
                 {"status":404,"error":"Not Found","message":"Usuario con id 99 no encontrado"}
                 """)))
     })
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @PostMapping("/{id}/miembros")
     public ResponseEntity<MiembroEquipoResponseDTO> agregarMiembro(@Parameter(description = "ID del equipo", example = "10") @PathVariable Long id, @Valid @RequestBody AgregarMiembroDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(equipoService.agregarMiembro(id, dto));
@@ -99,6 +104,7 @@ public class EquiposController {
             @ApiResponse(responseCode = "204", description = "Miembro eliminado"),
             @ApiResponse(responseCode = "404", description = "Miembro no encontrado")
     })
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @DeleteMapping("/{equipoId}/miembros/{usuarioId}")
     public ResponseEntity<Void> eliminarMiembro(@Parameter(description = "ID del equipo", example = "10") @PathVariable Long equipoId,
                                                 @Parameter(description = "ID del usuario a eliminar", example = "7") @PathVariable Long usuarioId) {
@@ -111,6 +117,7 @@ public class EquiposController {
             @ApiResponse(responseCode = "200", description = "Capitán actualizado"),
             @ApiResponse(responseCode = "404", description = "Equipo no encontrado")
     })
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @PutMapping("/capitan/{id}")
     public ResponseEntity<EquipoResponseDTO> actualizarCapitan(@Parameter(description = "ID del equipo", example = "10") @PathVariable Long id,
                                                                @Parameter(description = "ID del nuevo capitán", example = "5") @RequestParam Long capitanId) {
@@ -128,12 +135,14 @@ public class EquiposController {
                 {"status":404,"error":"Not Found","message":"Equipo con id 99 no encontrado"}
                 """)))
     })
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @DeleteMapping("/desactivar/{id}")
     public ResponseEntity<String> desactivarEquipo(@Parameter(description = "ID del equipo a desactivar", example = "10") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(equipoService.desactivarEquipo(id));
     }
 
     @Operation(summary = "Verificar si un equipo existe", description = "Usado por otros microservicios vía Feign")
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @GetMapping("/{id}/existe")
     public ResponseEntity<Boolean> existeEquipo(@PathVariable Long id) {
         try {

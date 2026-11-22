@@ -15,6 +15,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ public class UsuariosControllerV2 {
     private UsuarioModelAssembler assembler;
 
     @Operation(summary = "Crear un usuario (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<UsuarioResponseDTO>> crearUsuario(@Valid @RequestBody CrearUsuarioDTO dto) {
         UsuarioResponseDTO nuevo = usuarioService.crearUsuario(dto);
@@ -61,12 +63,14 @@ public class UsuariosControllerV2 {
     }
 
     @Operation(summary = "Actualizar un usuario (HATEOAS)")
+    @PreAuthorize("hasAnyRole('JUGADOR','ADMIN')")
     @PutMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<UsuarioResponseDTO>> actualizarUsuario(@PathVariable Long id, @Valid @RequestBody ActualizarUsuarioDTO dto) {
         return ResponseEntity.ok(assembler.toModel(usuarioService.actualizarUsuario(id, dto)));
     }
 
     @Operation(summary = "Desactivar un usuario (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<String> desactivarUsuario(@PathVariable Long id) {
         usuarioService.DesactivarUsuario(id);

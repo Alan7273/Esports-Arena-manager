@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +37,7 @@ public class PremiosControllerV2 {
     private PremioModelAssembler assembler;
 
     @Operation(summary = "Crear un premio (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<PremioResponseDTO>> crearPremio(@Valid @RequestBody CrearPremioDTO dto) {
         PremioResponseDTO nuevo = premioService.crearPremio(dto);
@@ -62,12 +64,14 @@ public class PremiosControllerV2 {
     }
 
     @Operation(summary = "Actualizar un premio (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<PremioResponseDTO>> actualizarPremio(@PathVariable Long id, @Valid @RequestBody ActualizarPremioDTO dto) {
         return ResponseEntity.ok(assembler.toModel(premioService.actualizarPremio(id, dto)));
     }
 
     @Operation(summary = "Asignar un premio a un participante")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/asignar/{id}")
     public ResponseEntity<String> asignarPremio(@PathVariable Long id, @RequestParam Long participanteId) {
         return ResponseEntity.status(HttpStatus.OK).body(premioService.asignarPremio(id, participanteId));

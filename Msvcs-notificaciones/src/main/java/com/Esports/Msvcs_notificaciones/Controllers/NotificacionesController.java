@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -43,6 +44,7 @@ public class NotificacionesController {
                 {"status":404,"error":"Not Found","message":"Usuario con id 99 no encontrado"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<NotificacionResponseDTO> crearNotificacion(@Valid @RequestBody CrearNotificacionDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(notificacionService.crearNotificacion(dto));
@@ -91,6 +93,7 @@ public class NotificacionesController {
                 {"status":404,"error":"Not Found","message":"Notificación con id 99 no encontrada"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> eliminarNotificacion(@Parameter(description = "ID de la notificación a eliminar", example = "30") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(notificacionService.eliminarNotificacion(id));

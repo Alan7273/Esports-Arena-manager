@@ -15,6 +15,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,6 +54,7 @@ public class JuegosControllerV2 {
     }
 
     @Operation(summary = "Crear juego (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<JuegoResponseDTO>> crearJuego(@Valid @RequestBody CrearJuegoDTO dto) {
         JuegoResponseDTO nuevo = juegosService.CrearJuego(dto);
@@ -62,12 +64,14 @@ public class JuegosControllerV2 {
     }
 
     @Operation(summary = "Actualizar juego (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<EntityModel<JuegoResponseDTO>> actualizarJuego(@PathVariable Long id, @Valid @RequestBody ActualizarJuegoDTO dto) {
         return ResponseEntity.ok(assembler.toModel(juegosService.actualizarJuego(id, dto)));
     }
 
     @Operation(summary = "Desactivar juego (HATEOAS)")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(value = "/desactivar/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<String> desactivarJuego(@PathVariable Long id) {
         juegosService.desactivarJuego(id);

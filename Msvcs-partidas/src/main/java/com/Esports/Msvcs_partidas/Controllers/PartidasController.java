@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,6 +45,7 @@ public class PartidasController {
                 {"status":404,"error":"Not Found","message":"El participante con id 99 no está inscrito en el torneo"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<PartidaResponseDTO> crearPartida(@Valid @RequestBody CrearPartidaDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(partidaService.crearPartida(dto));
@@ -79,6 +81,7 @@ public class PartidasController {
                 {"status":404,"error":"Not Found","message":"Partida con id 99 no encontrada"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/horario/{id}")
     public ResponseEntity<PartidaResponseDTO> actualizarHorario(@Parameter(description = "ID de la partida", example = "20") @PathVariable Long id,
                                                                 @Parameter(description = "Nueva fecha y hora", example = "2025-07-06T18:00:00") @RequestParam LocalDateTime fechaHora) {
@@ -96,6 +99,7 @@ public class PartidasController {
                 {"status":404,"error":"Not Found","message":"Partida con id 99 no encontrada"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/cancelar/{id}")
     public ResponseEntity<String> cancelarPartida(@Parameter(description = "ID de la partida a cancelar", example = "20") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(partidaService.cancelarPartida(id));

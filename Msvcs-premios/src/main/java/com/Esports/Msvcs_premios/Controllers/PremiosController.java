@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class PremiosController {
                 {"status":400,"error":"Bad Request","message":"El valor debe ser mayor a 0"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<PremioResponseDTO> crearPremio(@Valid @RequestBody CrearPremioDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(premioService.crearPremio(dto));
@@ -70,6 +72,7 @@ public class PremiosController {
             @ApiResponse(responseCode = "200", description = "Premio actualizado"),
             @ApiResponse(responseCode = "404", description = "Premio no encontrado")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<PremioResponseDTO> actualizarPremio(@Parameter(description = "ID del premio", example = "6") @PathVariable Long id, @Valid @RequestBody ActualizarPremioDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(premioService.actualizarPremio(id, dto));
@@ -86,6 +89,7 @@ public class PremiosController {
                 {"status":404,"error":"Not Found","message":"Premio con id 99 no encontrado"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/asignar/{id}")
     public ResponseEntity<String> asignarPremio(@Parameter(description = "ID del premio a asignar", example = "6") @PathVariable Long id,
                                                 @Parameter(description = "ID del participante ganador", example = "10") @RequestParam Long participanteId) {

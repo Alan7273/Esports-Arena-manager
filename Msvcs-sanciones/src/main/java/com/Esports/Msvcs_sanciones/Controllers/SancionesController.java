@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class SancionesController {
                 {"status":404,"error":"Not Found","message":"Usuario con id 99 no encontrado"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<SancionResponseDTO> crearSancion(@Valid @RequestBody CrearSancionDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(sancionesService.crearSancion(dto));
@@ -76,6 +78,7 @@ public class SancionesController {
                 {"status":404,"error":"Not Found","message":"Sanción con id 99 no encontrada"}
                 """)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/cerrar/{id}")
     public ResponseEntity<String> cerrarSancion(@Parameter(description = "ID de la sanción a cerrar", example = "3") @PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(sancionesService.cerrarSancion(id));
@@ -92,6 +95,7 @@ public class SancionesController {
             @ApiResponse(responseCode = "200", description = "Sanción actualizada"),
             @ApiResponse(responseCode = "404", description = "Sanción no encontrada")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<SancionResponseDTO> actualizarSancion(@Parameter(description = "ID de la sanción", example = "3") @PathVariable Long id, @Valid @RequestBody ActualizarSancionDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(sancionesService.actualizarSancion(id, dto));
