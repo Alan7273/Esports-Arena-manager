@@ -20,6 +20,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.7.7</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <packaging>pom</packaging>
     <modules>
         <module>Msvcs-inscripciones</module>
@@ -35,6 +45,7 @@
         <module>Msvcs-usuarios</module>
         <module>Msvcs-eureka</module>
         <module>Msvcs-gateway</module>
+        <module>Msvcs-Users</module>
     </modules>
 
 </project>

@@ -23,10 +23,13 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"            # para conectarte con DBeaver/pgAdmin
+      - "5432:5432"
+      
+    command: -c max_connections=300
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -138,18 +141,6 @@ services:
     environment:
       <<: *env-comun
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/notificaciones
-
-  # --- Frontend (ajusta la ruta a donde esté tu proyecto React) ---
-  frontend:
-    build:
-      context: ../Esports-Arena-ManagerEv2-React
-      args:
-        VITE_API_URL: http://localhost:8091
-    container_name: esports-frontend
-    restart: unless-stopped
-    depends_on: [gateway]
-    ports:
-      - "5173:80"             # mismo puerto que Vite: no hay que tocar el CORS
 
 volumes:
   pgdata:
