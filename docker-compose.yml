@@ -1,0 +1,155 @@
+# Plantilla común para los servicios Java (evita repetir)
+x-servicio: &servicio
+  restart: unless-stopped
+  depends_on:
+    postgres:
+      condition: service_healthy
+    eureka:
+      condition: service_started
+  environment: &env-comun
+    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
+    EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+    JWT_SECRET: ${JWT_SECRET}
+    SPRING_DATASOURCE_USERNAME: postgres
+    SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    JAVA_TOOL_OPTIONS: -Xmx256m
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: esports-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"            # para conectarte con DBeaver/pgAdmin
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  eureka:
+    build: { context: ., args: { MODULE: Msvcs-eureka } }
+    container_name: esports-eureka
+    restart: unless-stopped
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx256m
+    ports:
+      - "8761:8761"
+
+  gateway:
+    build: { context: ., args: { MODULE: Msvcs-gateway } }
+    container_name: esports-gateway
+    restart: unless-stopped
+    depends_on: [eureka]
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      JWT_SECRET: ${JWT_SECRET}
+      JAVA_TOOL_OPTIONS: -Xmx256m
+    ports:
+      - "8091:8091"
+
+  users:
+    <<: *servicio
+    build: { context: ., args: { MODULE: Msvcs-Users } }
+    environment:
+      <<: *env-comun
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/users
+
+  usuarios:
+    <<: *servicio
+    build: { context: ., args: { MODULE: Msvcs-usuarios } }
+    environment:
+      <<: *env-comun
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/usuarios
+
+  juegos:
+    <<: *servicio
+    build: { context: ., args: { MODULE: Msvcs-juegos } }
+    environment:
+      <<: *env-comun
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/juegos
+
+  equipos:
+    <<: *servicio
+    build: { context: ., args: { MODULE: Msvcs-equipos } }
+    environment:
+      <<: *env-comun
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/equipos
+
+  torneos:
+    <<: *servicio
+    build: { context: ., args: { MODULE: Msvcs-torneos } }
+    environment:
+      <<: *env-comun
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/torneos
+
+  inscripciones:
+    <<: *servicio
+    build: { context: ., args: { MODULE: Msvcs-inscripciones } }
+    environment:
+      <<: *env-comun
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/inscripciones
+
+  partidas:
+    <<: *servicio
+    build: { context: ., args: { MODULE: Msvcs-partidas } }
+    environment:
+      <<: *env-comun
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/partidas
+
+  resultados:
+    <<: *servicio
+    build: { context: ., args: { MODULE: Msvcs-resultados } }
+    environment:
+      <<: *env-comun
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/resultados
+
+  rankings:
+    <<: *servicio
+    build: { context: ., args: { MODULE: Msvcs-rankings } }
+    environment:
+      <<: *env-comun
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/rankings
+
+  premios:
+    <<: *servicio
+    build: { context: ., args: { MODULE: Msvcs-premios } }
+    environment:
+      <<: *env-comun
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/premios
+
+  sanciones:
+    <<: *servicio
+    build: { context: ., args: { MODULE: Msvcs-sanciones } }
+    environment:
+      <<: *env-comun
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/sanciones
+
+  notificaciones:
+    <<: *servicio
+    build: { context: ., args: { MODULE: Msvcs-notificaciones } }
+    environment:
+      <<: *env-comun
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/notificaciones
+
+  # --- Frontend (ajusta la ruta a donde esté tu proyecto React) ---
+  frontend:
+    build:
+      context: ../Esports-Arena-ManagerEv2-React
+      args:
+        VITE_API_URL: http://localhost:8091
+    container_name: esports-frontend
+    restart: unless-stopped
+    depends_on: [gateway]
+    ports:
+      - "5173:80"             # mismo puerto que Vite: no hay que tocar el CORS
+
+volumes:
+  pgdata:
