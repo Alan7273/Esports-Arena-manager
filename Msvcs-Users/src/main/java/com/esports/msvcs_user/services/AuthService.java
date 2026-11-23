@@ -47,7 +47,7 @@ public class AuthService {
 
         // 2) Si el cliente no indico roles, se asigna PACIENTE por defecto.
         Set<String> nombresRoles = (request.getRoles() == null || request.getRoles().isEmpty())
-                ? Set.of("ROLE_PACIENTE")
+                ? Set.of("ROLE_JUGADOR")
                 : request.getRoles();
 
         // 3) Buscar cada rol en la BD. Si piden un rol que no existe, se rechaza (400).
