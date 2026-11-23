@@ -4,6 +4,10 @@ import feign.Request;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import feign.RequestInterceptor;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.http.HttpHeaders;
 
 /**
  * Configuracion comun de los Feign clients de este microservicio.
@@ -27,4 +31,17 @@ public class FeignConfig {
                 readTimeout
         );
     }
+
+    @Bean
+    public RequestInterceptor reenviarToken() {
+    return template -> {
+        var attrs = RequestContextHolder.getRequestAttributes();
+        if (attrs instanceof ServletRequestAttributes servlet) {
+            String auth = servlet.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
+            if (auth != null) {
+                template.header(HttpHeaders.AUTHORIZATION, auth);   // reenvía el mismo Bearer
+            }
+        }
+    };
+}
 }
